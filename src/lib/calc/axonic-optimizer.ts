@@ -5,13 +5,18 @@ const SP500_RETURNS = [
   0.1196, 0.2183, -0.0438, 0.3149, 0.1840, 0.2871, -0.1811, 0.2623, 0.2502,
 ];
 
+// Default Axonic guaranteed fixed rate
+export const DEFAULT_GUARANTEED_RATE = 0.055;
+
 // Axonic product rates from the illustrator
-export const AXONIC_PRODUCTS = {
-  guaranteedFixed: { name: "Axonic Guaranteed Fixed", rate: 0.055, guaranteed: true, volatility: 0 },
-  index: { name: "Axonic Index (0% floor / 10% cap)", rate: 0.068, guaranteed: false, volatility: 0.06 },
-  portfolio: { name: "Axonic Portfolio Management", rate: 0.0825, guaranteed: false, volatility: 0.12 },
-  otherPortfolio: { name: "Other Portfolio (Market)", rate: 0.09, guaranteed: false, volatility: 0.16 },
-};
+export function getAxonicProducts(guaranteedRate: number) {
+  return {
+    guaranteedFixed: { name: "Axonic Guaranteed Fixed", rate: guaranteedRate, guaranteed: true, volatility: 0 },
+    index: { name: "Axonic Index (0% floor / 10% cap)", rate: 0.068, guaranteed: false, volatility: 0.06 },
+    portfolio: { name: "Axonic Portfolio Management", rate: 0.0825, guaranteed: false, volatility: 0.12 },
+    otherPortfolio: { name: "Other Portfolio (Market)", rate: 0.09, guaranteed: false, volatility: 0.16 },
+  };
+}
 
 export interface AllocationScenario {
   name: string;
@@ -45,25 +50,27 @@ function applyIndexFloorCap(marketReturn: number): number {
 export function analyzeScenario(
   scenario: AllocationScenario,
   premium: number,
-  years: number
+  years: number,
+  guaranteedRate: number = DEFAULT_GUARANTEED_RATE
 ): ScenarioResult {
   const { guaranteedFixedPct, indexPct, portfolioPct, otherPct } = scenario;
+  const products = getAxonicProducts(guaranteedRate);
 
   // Blended expected return
   const blendedReturn =
-    guaranteedFixedPct * AXONIC_PRODUCTS.guaranteedFixed.rate +
-    indexPct * AXONIC_PRODUCTS.index.rate +
-    portfolioPct * AXONIC_PRODUCTS.portfolio.rate +
-    otherPct * AXONIC_PRODUCTS.otherPortfolio.rate;
+    guaranteedFixedPct * products.guaranteedFixed.rate +
+    indexPct * products.index.rate +
+    portfolioPct * products.portfolio.rate +
+    otherPct * products.otherPortfolio.rate;
 
   // Guaranteed floor = guaranteed portion's contribution
-  const guaranteedFloor = guaranteedFixedPct * AXONIC_PRODUCTS.guaranteedFixed.rate;
+  const guaranteedFloor = guaranteedFixedPct * products.guaranteedFixed.rate;
 
   // Blended volatility (guaranteed portion has zero vol)
   const blendedVolatility = Math.sqrt(
-    Math.pow(indexPct * AXONIC_PRODUCTS.index.volatility, 2) +
-    Math.pow(portfolioPct * AXONIC_PRODUCTS.portfolio.volatility, 2) +
-    Math.pow(otherPct * AXONIC_PRODUCTS.otherPortfolio.volatility, 2)
+    Math.pow(indexPct * products.index.volatility, 2) +
+    Math.pow(portfolioPct * products.portfolio.volatility, 2) +
+    Math.pow(otherPct * products.otherPortfolio.volatility, 2)
   );
 
   // Sharpe ratio — undefined when volatility is zero (pure guaranteed)
@@ -73,7 +80,7 @@ export function analyzeScenario(
 
   // Simulate historical returns through the portfolio blend
   const historicalReturns = SP500_RETURNS.map((spReturn) => {
-    const guaranteedReturn = guaranteedFixedPct * 0.055; // always 5.5%
+    const guaranteedReturn = guaranteedFixedPct * guaranteedRate;
     const indexReturn = indexPct * applyIndexFloorCap(spReturn);
     const portfolioReturn = portfolioPct * (spReturn * 0.8 + 0.02); // ~80% market correlation + alpha
     const otherReturn = otherPct * spReturn;

@@ -1,7 +1,8 @@
 "use client";
 
-import { CarrierIllustrationYear } from "@/lib/calc/types";
+import { CarrierIllustrationYear, DealInputs } from "@/lib/calc/types";
 import { formatCurrency } from "@/lib/format";
+import { t } from "@/lib/translations";
 import {
   LineChart,
   Line,
@@ -16,9 +17,10 @@ import {
 interface CarrierIllustrationProps {
   years: CarrierIllustrationYear[];
   illustratedRates: [number, number, number];
+  language: DealInputs["language"];
 }
 
-export function CarrierIllustration({ years, illustratedRates }: CarrierIllustrationProps) {
+export function CarrierIllustration({ years, illustratedRates, language }: CarrierIllustrationProps) {
   const chartData = years.map((y) => ({
     year: y.year,
     age: y.age,
@@ -27,6 +29,9 @@ export function CarrierIllustration({ years, illustratedRates }: CarrierIllustra
     High: y.fundValueHigh,
   }));
 
+  const yearLabel = t("year", language);
+  const rateLabel = t("rateLabel", language);
+
   return (
     <div className="space-y-6">
       {/* Chart */}
@@ -34,19 +39,19 @@ export function CarrierIllustration({ years, illustratedRates }: CarrierIllustra
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={chartData} margin={{ top: 5, right: 20, bottom: 5, left: 20 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-            <XAxis dataKey="year" tick={{ fontSize: 12 }} label={{ value: "Year", position: "insideBottom", offset: -2, fontSize: 12 }} />
+            <XAxis dataKey="year" tick={{ fontSize: 12 }} label={{ value: yearLabel, position: "insideBottom", offset: -2, fontSize: 12 }} />
             <YAxis
               tick={{ fontSize: 11 }}
               tickFormatter={(v) => `$${(v / 1_000_000).toFixed(1)}M`}
             />
             <Tooltip
               formatter={(value) => formatCurrency(Number(value))}
-              labelFormatter={(label) => `Year ${label}`}
+              labelFormatter={(label) => `${yearLabel} ${label}`}
             />
             <Legend />
-            <Line type="monotone" dataKey="Low" stroke="#4C5C68" strokeWidth={1.5} dot={false} name={`${(illustratedRates[0] * 100).toFixed(0)}% Rate`} />
-            <Line type="monotone" dataKey="Mid" stroke="#0086A3" strokeWidth={2} dot={false} name={`${(illustratedRates[1] * 100).toFixed(0)}% Rate`} />
-            <Line type="monotone" dataKey="High" stroke="#003661" strokeWidth={1.5} dot={false} name={`${(illustratedRates[2] * 100).toFixed(0)}% Rate`} />
+            <Line type="monotone" dataKey="Low" stroke="#4C5C68" strokeWidth={1.5} dot={false} name={`${(illustratedRates[0] * 100).toFixed(0)}% ${rateLabel}`} />
+            <Line type="monotone" dataKey="Mid" stroke="#0086A3" strokeWidth={2} dot={false} name={`${(illustratedRates[1] * 100).toFixed(0)}% ${rateLabel}`} />
+            <Line type="monotone" dataKey="High" stroke="#003661" strokeWidth={1.5} dot={false} name={`${(illustratedRates[2] * 100).toFixed(0)}% ${rateLabel}`} />
           </LineChart>
         </ResponsiveContainer>
       </div>
@@ -56,14 +61,14 @@ export function CarrierIllustration({ years, illustratedRates }: CarrierIllustra
         <table className="w-full text-sm">
           <thead className="sticky top-0 bg-white">
             <tr className="border-b-2 border-navy">
-              <th className="text-left py-2 px-2 text-navy font-semibold">Year</th>
-              <th className="text-left py-2 px-2 text-navy font-semibold">Age</th>
-              <th className="text-right py-2 px-2 text-navy font-semibold">Fund (Low)</th>
-              <th className="text-right py-2 px-2 text-navy font-semibold">Fund (Mid)</th>
-              <th className="text-right py-2 px-2 text-navy font-semibold">Fund (High)</th>
-              <th className="text-right py-2 px-2 text-navy font-semibold">Surrender (Mid)</th>
-              <th className="text-right py-2 px-2 text-navy font-semibold">Death Benefit</th>
-              <th className="text-right py-2 px-2 text-navy font-semibold">Fees</th>
+              <th className="text-left py-2 px-2 text-navy font-semibold">{t("year", language)}</th>
+              <th className="text-left py-2 px-2 text-navy font-semibold">{t("age", language)}</th>
+              <th className="text-right py-2 px-2 text-navy font-semibold">{t("fundLow", language)}</th>
+              <th className="text-right py-2 px-2 text-navy font-semibold">{t("fundMid", language)}</th>
+              <th className="text-right py-2 px-2 text-navy font-semibold">{t("fundHigh", language)}</th>
+              <th className="text-right py-2 px-2 text-navy font-semibold">{t("surrenderMid", language)}</th>
+              <th className="text-right py-2 px-2 text-navy font-semibold">{t("deathBenefit", language)}</th>
+              <th className="text-right py-2 px-2 text-navy font-semibold">{t("fees", language)}</th>
             </tr>
           </thead>
           <tbody>

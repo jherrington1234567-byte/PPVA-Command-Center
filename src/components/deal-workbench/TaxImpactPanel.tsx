@@ -1,5 +1,6 @@
 import { TaxImpactResult, DealInputs } from "@/lib/calc/types";
 import { formatCurrency, formatCurrencyJPY } from "@/lib/format";
+import { t } from "@/lib/translations";
 
 interface TaxImpactPanelProps {
   taxImpact: TaxImpactResult;
@@ -21,25 +22,25 @@ export function TaxImpactPanel({ taxImpact, jpyUsdRate, language }: TaxImpactPan
       <div className={`grid gap-4 ${showJpy ? "grid-cols-2" : "grid-cols-1"}`}>
         <div className="bg-green-50 rounded-lg p-4 border border-green-200">
           <p className="text-xs font-medium text-green-700 uppercase">
-            Cumulative Tax Deferred (USD)
+            {t("cumulativeTaxDeferredUSD", language)}
           </p>
           <p className="mt-1 text-2xl font-semibold text-green-800">
             {formatCurrency(taxImpact.totalTaxSaved)}
           </p>
           <p className="text-xs text-green-600 mt-1">
-            Total tax deferred through PPVA wrapper over projection period
+            {t("totalTaxDeferredDesc", language)}
           </p>
         </div>
         {showJpy && (
           <div className="bg-green-50 rounded-lg p-4 border border-green-200">
             <p className="text-xs font-medium text-green-700 uppercase">
-              Cumulative Tax Deferred (JPY)
+              {t("cumulativeTaxDeferredJPY", language)}
             </p>
             <p className="mt-1 text-2xl font-semibold text-green-800">
               {formatCurrencyJPY(taxImpact.totalTaxSavedJpy)}
             </p>
             <p className="text-xs text-green-600 mt-1">
-              At current exchange rate of ¥{jpyUsdRate}/USD
+              {t("atCurrentRate", language)} ¥{jpyUsdRate}{t("perUSD", language)}
             </p>
           </div>
         )}
@@ -50,14 +51,14 @@ export function TaxImpactPanel({ taxImpact, jpyUsdRate, language }: TaxImpactPan
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b-2 border-navy">
-              <th className="text-left py-2 px-2 text-navy font-semibold">Year</th>
-              <th className="text-left py-2 px-2 text-navy font-semibold">Age</th>
-              <th className="text-right py-2 px-2 text-navy font-semibold">Existing CSV</th>
-              <th className="text-right py-2 px-2 text-navy font-semibold">Existing Gain</th>
-              <th className="text-right py-2 px-2 text-navy font-semibold">Tax (No PPVA)</th>
-              <th className="text-right py-2 px-2 text-navy font-semibold">PPVA Value</th>
+              <th className="text-left py-2 px-2 text-navy font-semibold">{t("year", language)}</th>
+              <th className="text-left py-2 px-2 text-navy font-semibold">{t("age", language)}</th>
+              <th className="text-right py-2 px-2 text-navy font-semibold">{t("existingCSV", language)}</th>
+              <th className="text-right py-2 px-2 text-navy font-semibold">{t("existingGain", language)}</th>
+              <th className="text-right py-2 px-2 text-navy font-semibold">{t("taxNoPPVA", language)}</th>
+              <th className="text-right py-2 px-2 text-navy font-semibold">{t("ppvaValue", language)}</th>
               {showJpy && (
-                <th className="text-right py-2 px-2 text-navy font-semibold">Combined (JPY)</th>
+                <th className="text-right py-2 px-2 text-navy font-semibold">{t("combinedJPY", language)}</th>
               )}
             </tr>
           </thead>

@@ -4,7 +4,7 @@ import { useState, useMemo } from "react";
 import { Card } from "@/components/ui/Card";
 import { NumberInput } from "@/components/ui/NumberInput";
 import { formatCurrency, formatPercent, formatCompact } from "@/lib/format";
-import { analyzeScenario, PRESET_SCENARIOS, AllocationScenario } from "@/lib/calc/axonic-optimizer";
+import { analyzeScenario, PRESET_SCENARIOS, AllocationScenario, DEFAULT_GUARANTEED_RATE } from "@/lib/calc/axonic-optimizer";
 import {
   LineChart, Line, AreaChart, Area, BarChart, Bar,
   XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Cell,
@@ -15,6 +15,7 @@ const SCENARIO_COLORS = ["#dc2626", "#f59e0b", "#0086A3", "#003661", "#16a34a", 
 export function AxonicOptimizer() {
   const [premium, setPremium] = useState(10_000_000);
   const [years, setYears] = useState(20);
+  const [guaranteedRate, setGuaranteedRate] = useState(DEFAULT_GUARANTEED_RATE);
   const [customAlloc, setCustomAlloc] = useState<AllocationScenario>({
     name: "Custom",
     guaranteedFixedPct: 0.30,
@@ -26,8 +27,8 @@ export function AxonicOptimizer() {
 
   const scenarios = useMemo(() => {
     const list = showCustom ? [...PRESET_SCENARIOS, customAlloc] : PRESET_SCENARIOS;
-    return list.map((s) => analyzeScenario(s, premium, years));
-  }, [premium, years, customAlloc, showCustom]);
+    return list.map((s) => analyzeScenario(s, premium, years, guaranteedRate));
+  }, [premium, years, guaranteedRate, customAlloc, showCustom]);
 
   // Sharpe ratio comparison chart data
   const sharpeData = scenarios.map((r, i) => ({
@@ -71,6 +72,16 @@ export function AxonicOptimizer() {
         <div className="flex flex-wrap items-end gap-6">
           <NumberInput label="Premium Amount" value={premium} onChange={setPremium} format="currency" min={1000000} className="w-48" />
           <NumberInput label="Projection Years" value={years} onChange={setYears} min={5} max={40} className="w-32" />
+          <NumberInput
+            label="Axonic Guaranteed Rate"
+            value={guaranteedRate}
+            onChange={setGuaranteedRate}
+            format="percent"
+            step={0.0025}
+            min={0.01}
+            max={0.15}
+            className="w-44"
+          />
           <label className="flex items-center gap-2 pb-1">
             <input type="checkbox" checked={showCustom} onChange={(e) => setShowCustom(e.target.checked)} className="accent-teal" />
             <span className="text-sm text-foreground">Show custom allocation</span>
@@ -111,7 +122,7 @@ export function AxonicOptimizer() {
           </div>
           <div>
             <p className="text-sm text-white/70">Axonic Guaranteed Rate</p>
-            <p className="text-2xl font-bold mt-1">5.50%</p>
+            <p className="text-2xl font-bold mt-1">{formatPercent(guaranteedRate)}</p>
             <p className="text-sm text-white/80 mt-0.5">Lifetime guaranteed, zero volatility</p>
           </div>
         </div>
@@ -246,11 +257,11 @@ export function AxonicOptimizer() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-sm">
           <div className="bg-navy/5 rounded-lg p-4">
             <p className="font-semibold text-navy mb-2">1. Reduces Portfolio Volatility</p>
-            <p className="text-slate-brand">The guaranteed 5.5% fixed rate has zero volatility. Every dollar allocated to Axonic Fixed removes that dollar from market risk entirely. Volatility drops proportionally.</p>
+            <p className="text-slate-brand">The guaranteed {formatPercent(guaranteedRate)} fixed rate has zero volatility. Every dollar allocated to Axonic Fixed removes that dollar from market risk entirely. Volatility drops proportionally.</p>
           </div>
           <div className="bg-teal/5 rounded-lg p-4">
             <p className="font-semibold text-teal mb-2">2. Maintains Meaningful Return</p>
-            <p className="text-slate-brand">At 5.5% guaranteed, Axonic Fixed still contributes strong absolute returns — well above risk-free rates. The return reduction is smaller than the volatility reduction.</p>
+            <p className="text-slate-brand">At {formatPercent(guaranteedRate)} guaranteed, Axonic Fixed still contributes strong absolute returns — well above risk-free rates. The return reduction is smaller than the volatility reduction.</p>
           </div>
           <div className="bg-green-50 rounded-lg p-4">
             <p className="font-semibold text-green-700 mb-2">3. Net Effect: Higher Sharpe</p>

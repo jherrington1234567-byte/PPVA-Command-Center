@@ -14,49 +14,50 @@ import { useDealCalculation } from "@/hooks/useDealCalculation";
 import { formatCurrency, formatPercent } from "@/lib/format";
 import { AnnualChargesResult, DealInputs } from "@/lib/calc/types";
 import { Button } from "@/components/ui/Button";
+import { t } from "@/lib/translations";
 
 const LANGUAGE_OPTIONS: { value: DealInputs["language"]; label: string }[] = [
   { value: "english", label: "English" },
-  { value: "japanese", label: "Japanese" },
-  { value: "both", label: "Both" },
+  { value: "japanese", label: "日本語" },
+  { value: "both", label: "Both / 両方" },
 ];
 
-function AnnualChargesDisplay({ charges }: { charges: AnnualChargesResult }) {
+function AnnualChargesDisplay({ charges, language }: { charges: AnnualChargesResult; language: DealInputs["language"] }) {
   return (
     <div className="space-y-4">
       <table className="w-full text-sm">
         <thead>
           <tr className="border-b-2 border-navy">
-            <th className="text-left py-2 px-3 text-navy font-semibold">Fee Type</th>
-            <th className="text-right py-2 px-3 text-navy font-semibold">Annual Amount</th>
-            <th className="text-right py-2 px-3 text-navy font-semibold">Rate</th>
+            <th className="text-left py-2 px-3 text-navy font-semibold">{t("feeType", language)}</th>
+            <th className="text-right py-2 px-3 text-navy font-semibold">{t("annualAmount", language)}</th>
+            <th className="text-right py-2 px-3 text-navy font-semibold">{t("rate", language)}</th>
           </tr>
         </thead>
         <tbody>
           <tr className="border-b border-gray-100">
-            <td className="py-2 px-3">Advantage M&E</td>
+            <td className="py-2 px-3">{t("advantageME", language)}</td>
             <td className="py-2 px-3 text-right font-mono">{formatCurrency(charges.advantageMeFee)}</td>
             <td className="py-2 px-3 text-right font-mono text-slate-brand">0.15%</td>
           </tr>
           <tr className="border-b border-gray-100">
-            <td className="py-2 px-3">Investment Advisor (RIA)</td>
+            <td className="py-2 px-3">{t("investmentAdvisor", language)}</td>
             <td className="py-2 px-3 text-right font-mono">{formatCurrency(charges.investmentAdvisorFee)}</td>
             <td className="py-2 px-3 text-right font-mono text-slate-brand">0.15%</td>
           </tr>
           <tr className="border-b border-gray-100">
-            <td className="py-2 px-3">Inspira Custodian</td>
+            <td className="py-2 px-3">{t("inspiraCustodian", language)}</td>
             <td className="py-2 px-3 text-right font-mono">{formatCurrency(charges.inspiraCustodianFee)}</td>
             <td className="py-2 px-3 text-right font-mono text-slate-brand">0.05%</td>
           </tr>
           <tr className="border-b border-gray-100">
-            <td className="py-2 px-3">Money Manager</td>
+            <td className="py-2 px-3">{t("moneyManager", language)}</td>
             <td className="py-2 px-3 text-right font-mono">{formatCurrency(charges.moneyManagerFee)}</td>
-            <td className="py-2 px-3 text-right font-mono text-slate-brand">configurable</td>
+            <td className="py-2 px-3 text-right font-mono text-slate-brand">{t("configurable", language)}</td>
           </tr>
         </tbody>
         <tfoot>
           <tr className="border-t-2 border-navy font-semibold">
-            <td className="py-2 px-3">Total Annual Charges</td>
+            <td className="py-2 px-3">{t("totalAnnualCharges", language)}</td>
             <td className="py-2 px-3 text-right font-mono">{formatCurrency(charges.totalAnnualCharge)}</td>
             <td className="py-2 px-3 text-right font-mono">{formatPercent(charges.totalAnnualChargePct)}</td>
           </tr>
@@ -69,42 +70,43 @@ function AnnualChargesDisplay({ charges }: { charges: AnnualChargesResult }) {
 export default function DealWorkbenchPage() {
   const { inputs, updateField, updateFundAllocation } = useDealInputs();
   const result = useDealCalculation(inputs);
+  const lang = inputs.language;
 
   const tabs = [
     {
-      label: "Waterfall",
+      label: t("waterfall", lang),
       content: (
-        <Card title="Premium Load Waterfall" description="Step-by-step breakdown of deposit allocation">
-          <PremiumLoadWaterfall waterfall={result.waterfall} />
+        <Card title={t("premiumLoadWaterfall", lang)} description={t("waterfallDesc", lang)}>
+          <PremiumLoadWaterfall waterfall={result.waterfall} language={lang} />
         </Card>
       ),
     },
     {
-      label: "Fund Allocation",
+      label: t("fundAllocation", lang),
       content: (
         <div className="space-y-6">
-          <Card title="Fund Allocation" description="Product allocation, estimated returns, and commissions">
-            <FundAllocationTable allocation={result.fundAllocation} />
+          <Card title={t("fundAllocation", lang)} description={t("productAllocation", lang)}>
+            <FundAllocationTable allocation={result.fundAllocation} language={lang} />
           </Card>
-          <Card title="Annual Fund Charges" description="Recurring fees deducted from fund value annually">
-            <AnnualChargesDisplay charges={result.annualCharges} />
+          <Card title={t("annualFundCharges", lang)} description={t("recurringFees", lang)}>
+            <AnnualChargesDisplay charges={result.annualCharges} language={lang} />
           </Card>
         </div>
       ),
     },
     {
-      label: "Carrier Illustration",
+      label: t("carrierIllustration", lang),
       content: (
-        <Card title="Carrier Illustration" description="Year-by-year fund value projection at three return rates">
-          <CarrierIllustration years={result.carrierIllustration} illustratedRates={inputs.illustratedRates} />
+        <Card title={t("carrierIllustration", lang)} description={t("yearByYear", lang)}>
+          <CarrierIllustration years={result.carrierIllustration} illustratedRates={inputs.illustratedRates} language={lang} />
         </Card>
       ),
     },
     {
-      label: "Tax Impact",
+      label: t("taxImpact", lang),
       content: (
-        <Card title="Tax Impact Analysis" description="Existing portfolio vs. PPVA — tax deferral benefit">
-          <TaxImpactPanel taxImpact={result.taxImpact} jpyUsdRate={inputs.jpyUsdRate} language={inputs.language} />
+        <Card title={t("taxImpactAnalysis", lang)} description={t("taxImpactDesc", lang)}>
+          <TaxImpactPanel taxImpact={result.taxImpact} jpyUsdRate={inputs.jpyUsdRate} language={lang} />
         </Card>
       ),
     },
@@ -113,8 +115,8 @@ export default function DealWorkbenchPage() {
   return (
     <>
       <PageHeader
-        title="Deal Workbench"
-        description="Structure and analyze PPVA deals — Advantage Life Puerto Rico (ALPR)"
+        title={t("dealWorkbench", lang)}
+        description={t("dealWorkbenchDesc", lang)}
       />
       <div className="max-w-[1600px] mx-auto flex h-[calc(100vh-112px)]">
         {/* Inputs Panel */}
@@ -130,7 +132,7 @@ export default function DealWorkbenchPage() {
         <div className="flex-1 overflow-y-auto p-6 space-y-6">
           {/* Language Mode Toggle */}
           <div className="flex items-center gap-2">
-            <span className="text-sm font-medium text-slate-brand mr-2">Language Mode:</span>
+            <span className="text-sm font-medium text-slate-brand mr-2">{t("languageMode", lang)}:</span>
             {LANGUAGE_OPTIONS.map((opt) => (
               <Button
                 key={opt.value}
@@ -142,7 +144,7 @@ export default function DealWorkbenchPage() {
               </Button>
             ))}
           </div>
-          <DealSummaryCards summary={result.summary} />
+          <DealSummaryCards summary={result.summary} language={lang} />
           <Tabs tabs={tabs} />
         </div>
       </div>
