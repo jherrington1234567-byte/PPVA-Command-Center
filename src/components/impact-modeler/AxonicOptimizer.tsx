@@ -33,7 +33,7 @@ export function AxonicOptimizer() {
   const sharpeData = scenarios.map((r, i) => ({
     name: r.scenario.name.length > 20 ? r.scenario.name.slice(0, 20) + "..." : r.scenario.name,
     fullName: r.scenario.name,
-    Sharpe: Math.min(r.sharpeRatio, 10),
+    Sharpe: r.sharpeRatio ?? 0,
     Return: r.blendedReturn,
     Volatility: r.blendedVolatility,
     color: SCENARIO_COLORS[i % SCENARIO_COLORS.length],
@@ -59,7 +59,10 @@ export function AxonicOptimizer() {
   });
 
   const pureMarket = scenarios[0];
-  const bestSharpe = scenarios.reduce((best, r) => r.sharpeRatio > best.sharpeRatio ? r : best, scenarios[0]);
+  // Best Sharpe among scenarios that actually have measurable volatility (exclude pure guaranteed)
+  const bestSharpe = scenarios
+    .filter((r) => r.sharpeRatio !== null)
+    .reduce((best, r) => (r.sharpeRatio ?? 0) > (best.sharpeRatio ?? 0) ? r : best, scenarios[0]);
 
   return (
     <div className="space-y-6">
@@ -95,16 +98,16 @@ export function AxonicOptimizer() {
           <div>
             <p className="text-sm text-white/70">Best Risk-Adjusted Scenario</p>
             <p className="text-lg font-bold mt-1">{bestSharpe.scenario.name}</p>
-            <p className="text-sm text-white/80 mt-0.5">Sharpe Ratio: {bestSharpe.sharpeRatio === Infinity ? "N/A (zero vol)" : bestSharpe.sharpeRatio.toFixed(2)}</p>
+            <p className="text-sm text-white/80 mt-0.5">Sharpe Ratio: {bestSharpe.sharpeRatio?.toFixed(2) ?? "N/A"}</p>
           </div>
           <div>
             <p className="text-sm text-white/70">Sharpe Improvement vs Pure Market</p>
             <p className="text-2xl font-bold mt-1">
-              {pureMarket.sharpeRatio > 0 && bestSharpe.sharpeRatio !== Infinity
+              {pureMarket.sharpeRatio && bestSharpe.sharpeRatio
                 ? `+${(((bestSharpe.sharpeRatio / pureMarket.sharpeRatio) - 1) * 100).toFixed(0)}%`
-                : "Significant"}
+                : "N/A"}
             </p>
-            <p className="text-sm text-white/80 mt-0.5">Market Sharpe: {pureMarket.sharpeRatio.toFixed(2)}</p>
+            <p className="text-sm text-white/80 mt-0.5">Market Sharpe: {pureMarket.sharpeRatio?.toFixed(2) ?? "N/A"}</p>
           </div>
           <div>
             <p className="text-sm text-white/70">Axonic Guaranteed Rate</p>
@@ -207,7 +210,7 @@ export function AxonicOptimizer() {
             </thead>
             <tbody>
               {scenarios.map((r, i) => {
-                const isBest = r === bestSharpe;
+                const isBest = r === bestSharpe && r.sharpeRatio !== null;
                 return (
                   <tr key={r.scenario.name} className={`border-b border-gray-100 ${isBest ? "bg-teal/5" : "hover:bg-gray-50"}`}>
                     <td className="py-2 px-3 font-medium">
@@ -220,7 +223,7 @@ export function AxonicOptimizer() {
                     <td className="py-2 px-3 text-right font-mono text-green-600">{formatPercent(r.guaranteedFloor)}</td>
                     <td className="py-2 px-3 text-right font-mono">{formatPercent(r.blendedVolatility)}</td>
                     <td className="py-2 px-3 text-right font-mono font-semibold text-teal">
-                      {r.sharpeRatio === Infinity ? "N/A" : r.sharpeRatio.toFixed(2)}
+                      {r.sharpeRatio !== null ? r.sharpeRatio.toFixed(2) : "N/A"}
                     </td>
                     <td className={`py-2 px-3 text-right font-mono ${r.worstYear < 0 ? "text-red-600" : "text-green-600"}`}>
                       {formatPercent(r.worstYear)}

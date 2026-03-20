@@ -26,7 +26,7 @@ export interface ScenarioResult {
   blendedReturn: number;
   guaranteedFloor: number;
   blendedVolatility: number;
-  sharpeRatio: number;
+  sharpeRatio: number | null;
   historicalReturns: number[];
   worstYear: number;
   bestYear: number;
@@ -66,10 +66,10 @@ export function analyzeScenario(
     Math.pow(otherPct * AXONIC_PRODUCTS.otherPortfolio.volatility, 2)
   );
 
-  // Sharpe ratio
+  // Sharpe ratio — undefined when volatility is zero (pure guaranteed)
   const sharpeRatio = blendedVolatility > 0
     ? (blendedReturn - RISK_FREE_RATE) / blendedVolatility
-    : blendedReturn > RISK_FREE_RATE ? Infinity : 0;
+    : null;
 
   // Simulate historical returns through the portfolio blend
   const historicalReturns = SP500_RETURNS.map((spReturn) => {
