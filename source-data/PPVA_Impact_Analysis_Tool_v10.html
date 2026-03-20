@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PPVA Impact Analysis</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f8fafc; padding: 20px; }
+        .container { max-width: 1400px; margin: 0 auto; }
+        h1 { text-align: center; color: #1e293b; font-size: 28px; margin-bottom: 5px; }
+        .subtitle { text-align: center; color: #64748b; font-size: 14px; margin-bottom: 5px; }
+        .subtitle-jp { text-align: center; color: #94a3b8; font-size: 12px; margin-bottom: 20px; }
+        .controls { background: white; border-radius: 12px; padding: 20px; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .section-title { font-size: 14px; font-weight: 600; color: #1e293b; margin-bottom: 2px; }
+        .section-title-jp { font-size: 11px; color: #94a3b8; margin-bottom: 12px; }
+        .portfolio-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
+        .controls-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 20px; }
+        .control-item label { display: block; font-size: 11px; font-weight: 600; color: #475569; margin-bottom: 8px; line-height: 1.4; }
+        .control-item label .jp { font-weight: 400; color: #94a3b8; }
+        .control-item input[type="range"] { width: 100%; margin-bottom: 5px; }
+        .control-value { text-align: center; font-weight: 700; color: #2563eb; font-size: 16px; }
+        .text-input { width: 100%; padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px; font-weight: 500; color: #1e293b; }
+        .toggle-btn { padding: 10px 24px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 14px; }
+        .toggle-btn.usd { background: #2563eb; color: white; }
+        .toggle-btn.jpy { background: #f59e0b; color: white; }
+        .toggle-container { display: flex; justify-content: center; margin-top: 16px; gap: 12px; }
+        .print-btn { padding: 10px 24px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 14px; background: #059669; color: white; }
+        .print-btn:hover { background: #047857; }
+        .chart-box { background: white; border-radius: 12px; padding: 20px; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .chart-box h3 { font-size: 14px; color: #1e293b; margin-bottom: 2px; }
+        .chart-box .subtitle-jp { text-align: left; margin-bottom: 15px; }
+        .chart-container { position: relative; height: 300px; }
+        
+        .results-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 20px; }
+        .result-card { border-radius: 10px; padding: 15px; font-size: 11px; }
+        .result-card.red { background: #fef2f2; border: 2px solid #fecaca; }
+        .result-card.blue { background: #eff6ff; border: 2px solid #bfdbfe; }
+        .result-card.green { background: #f0fdf4; border: 2px solid #bbf7d0; }
+        .result-card.amber { background: #fffbeb; border: 2px solid #fde68a; }
+        .result-card h4 { font-size: 13px; margin-bottom: 2px; }
+        .result-card .card-subtitle { font-size: 10px; margin-bottom: 12px; }
+        .result-card.red h4, .result-card.red .card-subtitle { color: #991b1b; }
+        .result-card.blue h4, .result-card.blue .card-subtitle { color: #1e40af; }
+        .result-card.green h4, .result-card.green .card-subtitle { color: #166534; }
+        .result-card.amber h4, .result-card.amber .card-subtitle { color: #92400e; }
+        
+        .calc-row { display: flex; justify-content: space-between; padding: 2px 0; }
+        .calc-row span:first-child { color: #64748b; }
+        .calc-row span:last-child { font-weight: 500; font-family: 'SF Mono', Monaco, monospace; }
+        .calc-row.indent span:first-child { padding-left: 12px; }
+        .calc-row.add span:first-child::before { content: "+ "; color: #94a3b8; }
+        .calc-row.subtract span:first-child::before { content: "− "; color: #94a3b8; }
+        .calc-divider { border-top: 1px dashed #cbd5e1; margin: 6px 0; }
+        .calc-subtotal { border-top: 1px solid #94a3b8; margin-top: 6px; padding-top: 6px; }
+        .calc-subtotal .calc-row span:first-child { font-weight: 600; color: #475569; }
+        .calc-total { border-top: 2px solid; margin-top: 8px; padding-top: 8px; }
+        .result-card.red .calc-total { border-color: #f87171; }
+        .result-card.blue .calc-total { border-color: #60a5fa; }
+        .result-card.green .calc-total { border-color: #4ade80; }
+        .result-card.amber .calc-total { border-color: #fbbf24; }
+        .calc-total .calc-row span { font-weight: 700 !important; font-size: 12px; }
+        .result-card.red .calc-total .calc-row span:last-child { color: #dc2626; }
+        .result-card.blue .calc-total .calc-row span:last-child { color: #2563eb; }
+        .result-card.green .calc-total .calc-row span:last-child { color: #16a34a; }
+        .result-card.amber .calc-total .calc-row span:last-child { color: #d97706; }
+        
+        .gain-reduction { background: #dcfce7; border-radius: 6px; padding: 8px; margin-top: 10px; }
+        .gain-reduction .calc-row span { color: #166534 !important; font-weight: 600 !important; }
+        
+        .schedule-box { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .schedule-box h3 { font-size: 14px; color: #1e293b; margin-bottom: 2px; }
+        .schedule-box .subtitle-jp { text-align: left; margin-bottom: 15px; }
+        table { width: 100%; border-collapse: collapse; font-size: 12px; }
+        th, td { padding: 8px 12px; text-align: center; }
+        th { background: #f1f5f9; font-weight: 600; color: #475569; }
+        th.highlight { background: #bfdbfe; }
+        td { border-bottom: 1px solid #e2e8f0; }
+        td.highlight { background: #eff6ff; font-weight: 700; }
+        td:first-child { text-align: left; font-weight: 600; }
+        tr:nth-child(1) td:first-child { color: #1e40af; }
+        tr:nth-child(2) td:first-child { color: #166534; }
+        tr:nth-child(3) td:first-child { color: #92400e; }
+        .footer { text-align: center; color: #94a3b8; font-size: 11px; margin-top: 20px; }
+        
+        @media (max-width: 1200px) { .controls-grid { grid-template-columns: repeat(3, 1fr) !important; } .results-grid { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 768px) { .controls-grid { grid-template-columns: repeat(2, 1fr) !important; } .results-grid { grid-template-columns: 1fr; } .portfolio-grid { grid-template-columns: 1fr; } }
+        
+        /* Print styles */
+        @media print {
+            body { background: white; padding: 10px; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+            .controls { display: none; }
+            .chart-box { display: none; }
+            .toggle-container { display: none; }
+            .container { max-width: 100%; }
+            .results-grid { grid-template-columns: repeat(4, 1fr); gap: 10px; }
+            .result-card { page-break-inside: avoid; padding: 12px; }
+            .schedule-box { page-break-inside: avoid; }
+            .footer { margin-top: 10px; }
+            h1 { font-size: 22px; }
+            .print-header { display: block !important; margin-bottom: 15px; padding: 10px; background: #f8fafc; border-radius: 8px; }
+            .print-header p { margin: 3px 0; font-size: 11px; color: #475569; }
+        }
+        .print-header { display: none; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>PPVA Impact Analysis</h1>
+        <p class="subtitle">Interactive Scenario Modeling Tool</p>
+        <p class="subtitle-jp">プライベート・プレースメント・変額アニュイティ</p>
+        
+        <div class="print-header" id="printHeader">
+            <p><strong>Scenario Parameters / シナリオパラメーター:</strong></p>
+            <p id="printParams"></p>
+        </div>
+        
+<div class="controls">
+            <div class="section-title">Current Portfolio (without PPVA)</div>
+            <div class="section-title-jp">現行ポートフォーリオ（PPVA除く）</div>
+            <div class="portfolio-grid">
+                <div class="control-item">
+                    <label>Current CSV (USD)<br/><span class="jp">現行解約返戻金（米ドル）</span></label>
+                    <input type="text" id="currentCSV" class="text-input" value="18,963,106">
+                </div>
+                <div class="control-item">
+                    <label>Current Basis (USD)<br/><span class="jp">元本（米ドル）</span></label>
+                    <input type="text" id="currentBasis" class="text-input" value="16,195,676">
+                </div>
+            </div>
+            <div class="section-title">Scenario Parameters</div>
+            <div class="section-title-jp">シナリオパラメーター</div>
+            <div class="controls-grid" style="grid-template-columns: repeat(6, 1fr);">
+                <div class="control-item"><label>FX at Initial Contribution (¥/$)<br/><span class="jp">初期投資時の為替</span></label><input type="range" id="fxContribution" min="50" max="300" value="110"><div class="control-value" id="fxContributionValue">¥110</div></div>
+                <div class="control-item"><label>Current FX Rate (¥/$)<br/><span class="jp">現在の為替レート</span></label><input type="range" id="fxCurrent" min="50" max="300" value="150"><div class="control-value" id="fxCurrentValue">¥150</div></div>
+                <div class="control-item"><label>FX at Analysis Year (¥/$)<br/><span class="jp">分析時の為替</span></label><input type="range" id="fxDissolution" min="50" max="300" value="160"><div class="control-value" id="fxDissolutionValue">¥160</div></div>
+                <div class="control-item"><label>CSV Growth Rate<br/><span class="jp">解約返戻金成長率</span></label><input type="range" id="csvGrowth" min="0" max="10" step="0.5" value="6"><div class="control-value" id="csvGrowthValue">6.0%</div></div>
+                <div class="control-item"><label>Analysis Year<br/><span class="jp">分析年</span></label><input type="range" id="exitYear" min="1" max="10" value="1"><div class="control-value" id="exitYearValue">Year 1</div></div>
+                <div class="control-item"><label>New PPVA Premium ($M)<br/><span class="jp">新規PPVA保険料（米百万ドル単位）</span></label><input type="range" id="newPremium" min="5" max="30" step="0.5" value="7"><div class="control-value" id="newPremiumValue">$7M</div></div>
+            </div>
+            <div class="toggle-container">
+                <button class="toggle-btn usd" id="currencyToggle" onclick="toggleCurrency()">Display Currency / 表示通貨: $ USD</button>
+                <button class="print-btn" onclick="printSnapshot()">🖨️ Print Snapshot</button>
+            </div>
+        </div>
+        
+        <div class="chart-box">
+            <h3 id="barChartTitle">Gain Comparison (USD)</h3>
+            <p class="subtitle-jp">ゲインの比較</p>
+            <div class="chart-container"><canvas id="barChart"></canvas></div>
+        </div>
+        
+        <div class="results-grid">
+            <!-- Current Reality -->
+            <div class="result-card red">
+                <h4>Performance Result</h4>
+                <p class="card-subtitle">運用結果</p>
+                
+                <div class="calc-row"><span>Original Basis / 元本</span><span id="crBasis">$16.20M</span></div>
+                <div class="calc-row add"><span>Policy Growth / 成長</span><span id="crGrowth">$1.14M</span></div>
+                <div class="calc-row add"><span>FX Impact / 為替影響</span><span id="crFx">$4.32M</span></div>
+                
+                <div class="calc-subtotal">
+                    <div class="calc-row"><span>Cash Surrender Value / 解約返戻金</span><span id="crCsv">$20.10M</span></div>
+                </div>
+                
+                <div class="calc-row subtract" style="margin-top:6px;"><span>Less Basis / 元本との差</span><span id="crBasis2">($16.20M)</span></div>
+                
+                <div class="calc-total">
+                    <div class="calc-row"><span>Gain / (Loss) 益/(損)</span><span id="crGain">$8.22M</span></div>
+                </div>
+            </div>
+
+            <!-- 5 Year 95% -->
+            <div class="result-card blue">
+                <h4 id="gojiTitle">5 Year 95% - 95% Surrender Charge</h4>
+                <p class="card-subtitle">5年95%デザイン</p>
+                
+                <div class="calc-row"><span>Original Basis / 元本</span><span id="gojiBasisOrig">$16.20M</span></div>
+                <div class="calc-row add"><span>New PPVA Premium / 新規保険料</span><span id="gojiPremium">$8.70M</span></div>
+                <div class="calc-divider"></div>
+                <div class="calc-row"><span>Combined Basis / 合計</span><span id="gojiBasis">$24.90M</span></div>
+                
+                <div class="calc-divider"></div>
+                
+                <div class="calc-row"><span>Existing CSV / 既存解約返戻金</span><span id="gojiExistingCsv">$20.10M</span></div>
+                <div class="calc-row add"><span>PPVA Surrender Value / PPVA解約返戻金</span><span id="gojiPpvaCsv">$0.40M</span></div>
+                
+                <div class="calc-subtotal">
+                    <div class="calc-row"><span>Total CSV / 解約返戻金合計</span><span id="gojiCsv">$20.50M</span></div>
+                </div>
+                
+                <div class="calc-row subtract" style="margin-top:6px;"><span>Less Combined Basis / 元本との差</span><span id="gojiBasis2">($24.90M)</span></div>
+                
+                <div class="calc-total">
+                    <div class="calc-row"><span>Gain / (Loss) 益/(損)</span><span id="gojiGain">($4.40M)</span></div>
+                </div>
+                
+                <div class="gain-reduction">
+                    <div class="calc-row"><span>Value Difference / 価値差額</span><span id="gojiDiff">$12.62M</span></div>
+                </div>
+            </div>
+
+            <!-- 5 Year 90% -->
+            <div class="result-card green">
+                <h4 id="honeyTitle">5 Year 90% - 90% Surrender Charge</h4>
+                <p class="card-subtitle">5年90%デザイン</p>
+                
+                <div class="calc-row"><span>Original Basis / 元本</span><span id="honeyBasisOrig">$16.20M</span></div>
+                <div class="calc-row add"><span>New PPVA Premium / 新規保険料</span><span id="honeyPremium">$8.70M</span></div>
+                <div class="calc-divider"></div>
+                <div class="calc-row"><span>Combined Basis / 合計</span><span id="honeyBasis">$24.90M</span></div>
+                
+                <div class="calc-divider"></div>
+                
+                <div class="calc-row"><span>Existing CSV / 既存解約返戻金</span><span id="honeyExistingCsv">$20.10M</span></div>
+                <div class="calc-row add"><span>PPVA Surrender Value / PPVA解約返戻金</span><span id="honeyPpvaCsv">$0.81M</span></div>
+                
+                <div class="calc-subtotal">
+                    <div class="calc-row"><span>Total CSV / 解約返戻金合計</span><span id="honeyCsv">$20.91M</span></div>
+                </div>
+                
+                <div class="calc-row subtract" style="margin-top:6px;"><span>Less Combined Basis / 元本との差</span><span id="honeyBasis2">($24.90M)</span></div>
+                
+                <div class="calc-total">
+                    <div class="calc-row"><span>Gain / (Loss) 益/(損)</span><span id="honeyGain">($3.99M)</span></div>
+                </div>
+                
+                <div class="gain-reduction">
+                    <div class="calc-row"><span>Value Difference / 価値差額</span><span id="honeyDiff">$12.21M</span></div>
+                </div>
+            </div>
+
+            <!-- 10 Year 90% -->
+            <div class="result-card amber">
+                <h4 id="tentenTitle">10 Year 90% - 90% Surrender Charge</h4>
+                <p class="card-subtitle">10年90%デザイン</p>
+                
+                <div class="calc-row"><span>Original Basis / 元本</span><span id="tentenBasisOrig">$16.20M</span></div>
+                <div class="calc-row add"><span>New PPVA Premium / 新規保険料</span><span id="tentenPremium">$8.70M</span></div>
+                <div class="calc-divider"></div>
+                <div class="calc-row"><span>Combined Basis / 合計</span><span id="tentenBasis">$24.90M</span></div>
+                
+                <div class="calc-divider"></div>
+                
+                <div class="calc-row"><span>Existing CSV / 既存解約返戻金</span><span id="tentenExistingCsv">$20.10M</span></div>
+                <div class="calc-row add"><span>PPVA Surrender Value / PPVA解約返戻金</span><span id="tentenPpvaCsv">$0.81M</span></div>
+                
+                <div class="calc-subtotal">
+                    <div class="calc-row"><span>Total CSV / 解約返戻金合計</span><span id="tentenCsv">$20.91M</span></div>
+                </div>
+                
+                <div class="calc-row subtract" style="margin-top:6px;"><span>Less Combined Basis / 元本との差</span><span id="tentenBasis2">($24.90M)</span></div>
+                
+                <div class="calc-total">
+                    <div class="calc-row"><span>Gain / (Loss) 益/(損)</span><span id="tentenGain">($3.99M)</span></div>
+                </div>
+                
+                <div class="gain-reduction">
+                    <div class="calc-row"><span>Value Difference / 価値差額</span><span id="tentenDiff">$12.21M</span></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="schedule-box">
+            <h3 id="scheduleTitle">Surrender Charge Schedule (Year 1 highlighted)</h3>
+            <p class="subtitle-jp" id="scheduleTitleJP">解約手数料スケジュール（1年目をハイライト）</p>
+            <table>
+                <thead><tr><th>Design / デザイン</th><th id="y1">1</th><th id="y2">2</th><th id="y3">3</th><th id="y4">4</th><th id="y5">5</th><th id="y6">6</th><th id="y7">7</th><th id="y8">8</th><th id="y9">9</th><th id="y10">10</th></tr></thead>
+                <tbody>
+                    <tr><td>5 Year 95%</td><td id="d3y1">95%</td><td id="d3y2">90%</td><td id="d3y3">80%</td><td id="d3y4">70%</td><td id="d3y5">60%</td><td id="d3y6">0%</td><td id="d3y7">0%</td><td id="d3y8">0%</td><td id="d3y9">0%</td><td id="d3y10">0%</td></tr>
+                    <tr><td>5 Year 90%</td><td id="d4y1">90%</td><td id="d4y2">70%</td><td id="d4y3">50%</td><td id="d4y4">30%</td><td id="d4y5">10%</td><td id="d4y6">0%</td><td id="d4y7">0%</td><td id="d4y8">0%</td><td id="d4y9">0%</td><td id="d4y10">0%</td></tr>
+                    <tr><td>10 Year 90%</td><td id="d5y1">90%</td><td id="d5y2">80%</td><td id="d5y3">70%</td><td id="d5y4">60%</td><td id="d5y5">50%</td><td id="d5y6">40%</td><td id="d5y7">30%</td><td id="d5y8">20%</td><td id="d5y9">10%</td><td id="d5y10">0%</td></tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <p class="footer">7% premium charge / 保険料手数料</p>
+    </div>
+
+    <script>
+        const PREMIUM_CHARGE = 0.07;
+        const SURRENDER_SCHEDULES = {
+            goji: [0.95, 0.90, 0.80, 0.70, 0.60, 0, 0, 0, 0, 0],
+            honey: [0.90, 0.70, 0.50, 0.30, 0.10, 0, 0, 0, 0, 0],
+            tenTen: [0.90, 0.80, 0.70, 0.60, 0.50, 0.40, 0.30, 0.20, 0.10, 0]
+        };
+        let showJPY = false;
+        let barChart;
+        
+        function initChart() {
+            const ctx = document.getElementById('barChart').getContext('2d');
+            barChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Performance Result\n運用結果', '5 Year 95%\nPPVAデザイン', '5 Year 90%\nPPVAデザイン', '10 Year 90%\nPPVAデザイン'],
+                    datasets: [{ label: 'Gain', data: [0, 0, 0, 0], backgroundColor: ['#ef4444', '#3b82f6', '#22c55e', '#f59e0b'] }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: { y: { ticks: { callback: v => showJPY ? '¥' + v + 'M' : '$' + v + 'M' } } }
+                }
+            });
+        }
+        
+        function parseCurrency(value) { return Number(value.replace(/,/g, '')) || 0; }
+        
+        function fmt(usd, jpy) {
+            const value = showJPY ? jpy : usd;
+            const symbol = showJPY ? '¥' : '$';
+            const amount = Math.abs(value / 1e6).toFixed(2);
+            return value < 0 ? '(' + symbol + amount + 'M)' : symbol + amount + 'M';
+        }
+        
+        function calculate() {
+            const currentCSV = parseCurrency(document.getElementById('currentCSV').value);
+            const currentBasis = parseCurrency(document.getElementById('currentBasis').value);
+            const fxContribution = parseFloat(document.getElementById('fxContribution').value);
+            const fxCurrent = parseFloat(document.getElementById('fxCurrent').value);
+            const fxDissolution = parseFloat(document.getElementById('fxDissolution').value);
+            const csvGrowth = parseFloat(document.getElementById('csvGrowth').value);
+            const exitYear = parseInt(document.getElementById('exitYear').value);
+            const newPremium = parseFloat(document.getElementById('newPremium').value);
+            
+            const growthFactor = Math.pow(1 + csvGrowth / 100, exitYear);
+            const premiumUSD = newPremium * 1e6;
+            
+            // Current Reality
+            const crBasisUSD = currentBasis;
+            const crBasisJPY = currentBasis * fxContribution;
+            const crGrowthUSD = currentCSV * (growthFactor - 1);
+            const crGrowthJPY = crGrowthUSD * fxDissolution;
+            const crExistingCsvUSD = currentCSV * growthFactor;
+            const crFxImpactJPY = crExistingCsvUSD * (fxDissolution - fxContribution);
+            const crFxImpactUSD = crFxImpactJPY / fxDissolution;
+            const crCsvUSD = crExistingCsvUSD;
+            const crCsvJPY = crCsvUSD * fxDissolution;
+            const crGainJPY = crCsvJPY - crBasisJPY;
+            const crGainUSD = crGainJPY / fxDissolution;
+            
+            function calcDesign(schedule) {
+                const netPremiumUSD = premiumUSD * (1 - PREMIUM_CHARGE);
+                const sc = schedule[exitYear - 1];
+                
+                // Basis - use fxCurrent for new premium basis (matches Excel methodology)
+                const basisOrigUSD = currentBasis;
+                const basisOrigJPY = currentBasis * fxContribution;
+                const newPremiumBasisJPY = premiumUSD * fxCurrent;  // Premium basis at current FX
+                const combinedBasisUSD = currentBasis + premiumUSD;
+                const combinedBasisJPY = basisOrigJPY + newPremiumBasisJPY;
+                
+                // CSV components
+                const existingCsvUSD = crExistingCsvUSD;
+                const existingCsvJPY = existingCsvUSD * fxDissolution;
+                const ppvaAccumUSD = netPremiumUSD * growthFactor;
+                const ppvaCsvUSD = ppvaAccumUSD * (1 - sc);
+                const ppvaCsvJPY = ppvaCsvUSD * fxDissolution;
+                const totalCsvUSD = existingCsvUSD + ppvaCsvUSD;
+                const totalCsvJPY = totalCsvUSD * fxDissolution;
+                
+                // Gain
+                const gainJPY = totalCsvJPY - combinedBasisJPY;
+                const gainUSD = gainJPY / fxDissolution;
+                const diffJPY = crGainJPY - gainJPY;
+                const diffUSD = crGainUSD - gainUSD;
+                
+                return {
+                    sc: sc * 100,
+                    basisOrigUSD, basisOrigJPY,
+                    premiumUSD, premiumJPY: premiumUSD * fxCurrent,
+                    combinedBasisUSD, combinedBasisJPY,
+                    existingCsvUSD, existingCsvJPY,
+                    ppvaCsvUSD, ppvaCsvJPY,
+                    totalCsvUSD, totalCsvJPY,
+                    gainUSD, gainJPY,
+                    diffUSD, diffJPY
+                };
+            }
+            
+            return {
+                cr: {
+                    basisUSD: crBasisUSD, basisJPY: crBasisJPY,
+                    growthUSD: crGrowthUSD, growthJPY: crGrowthJPY,
+                    fxImpactUSD: crFxImpactUSD, fxImpactJPY: crFxImpactJPY,
+                    csvUSD: crCsvUSD, csvJPY: crCsvJPY,
+                    gainUSD: crGainUSD, gainJPY: crGainJPY
+                },
+                goji: calcDesign(SURRENDER_SCHEDULES.goji),
+                honey: calcDesign(SURRENDER_SCHEDULES.honey),
+                tenTen: calcDesign(SURRENDER_SCHEDULES.tenTen),
+                exitYear
+            };
+        }
+        
+        function updateUI() {
+            document.getElementById('fxContributionValue').textContent = '¥' + document.getElementById('fxContribution').value;
+            document.getElementById('fxCurrentValue').textContent = '¥' + document.getElementById('fxCurrent').value;
+            document.getElementById('fxDissolutionValue').textContent = '¥' + document.getElementById('fxDissolution').value;
+            document.getElementById('csvGrowthValue').textContent = parseFloat(document.getElementById('csvGrowth').value).toFixed(1) + '%';
+            document.getElementById('exitYearValue').textContent = 'Year ' + document.getElementById('exitYear').value;
+            document.getElementById('newPremiumValue').textContent = '$' + document.getElementById('newPremium').value + 'M';
+            
+            const r = calculate();
+            
+            // Current Reality
+            document.getElementById('crBasis').textContent = fmt(r.cr.basisUSD, r.cr.basisJPY);
+            document.getElementById('crGrowth').textContent = fmt(r.cr.growthUSD, r.cr.growthJPY);
+            document.getElementById('crFx').textContent = fmt(r.cr.fxImpactUSD, r.cr.fxImpactJPY);
+            document.getElementById('crCsv').textContent = fmt(r.cr.csvUSD, r.cr.csvJPY);
+            document.getElementById('crBasis2').textContent = fmt(-r.cr.basisUSD, -r.cr.basisJPY);
+            document.getElementById('crGain').textContent = fmt(r.cr.gainUSD, r.cr.gainJPY);
+            
+            // 5 Year 95%
+            document.getElementById('gojiTitle').textContent = '5 Year 95% - ' + r.goji.sc + '% Surrender Charge';
+            document.getElementById('gojiBasisOrig').textContent = fmt(r.goji.basisOrigUSD, r.goji.basisOrigJPY);
+            document.getElementById('gojiPremium').textContent = fmt(r.goji.premiumUSD, r.goji.premiumJPY);
+            document.getElementById('gojiBasis').textContent = fmt(r.goji.combinedBasisUSD, r.goji.combinedBasisJPY);
+            document.getElementById('gojiExistingCsv').textContent = fmt(r.goji.existingCsvUSD, r.goji.existingCsvJPY);
+            document.getElementById('gojiPpvaCsv').textContent = fmt(r.goji.ppvaCsvUSD, r.goji.ppvaCsvJPY);
+            document.getElementById('gojiCsv').textContent = fmt(r.goji.totalCsvUSD, r.goji.totalCsvJPY);
+            document.getElementById('gojiBasis2').textContent = fmt(-r.goji.combinedBasisUSD, -r.goji.combinedBasisJPY);
+            document.getElementById('gojiGain').textContent = fmt(r.goji.gainUSD, r.goji.gainJPY);
+            document.getElementById('gojiDiff').textContent = fmt(r.goji.diffUSD, r.goji.diffJPY);
+            
+            // 5 Year 90%
+            document.getElementById('honeyTitle').textContent = '5 Year 90% - ' + r.honey.sc + '% Surrender Charge';
+            document.getElementById('honeyBasisOrig').textContent = fmt(r.honey.basisOrigUSD, r.honey.basisOrigJPY);
+            document.getElementById('honeyPremium').textContent = fmt(r.honey.premiumUSD, r.honey.premiumJPY);
+            document.getElementById('honeyBasis').textContent = fmt(r.honey.combinedBasisUSD, r.honey.combinedBasisJPY);
+            document.getElementById('honeyExistingCsv').textContent = fmt(r.honey.existingCsvUSD, r.honey.existingCsvJPY);
+            document.getElementById('honeyPpvaCsv').textContent = fmt(r.honey.ppvaCsvUSD, r.honey.ppvaCsvJPY);
+            document.getElementById('honeyCsv').textContent = fmt(r.honey.totalCsvUSD, r.honey.totalCsvJPY);
+            document.getElementById('honeyBasis2').textContent = fmt(-r.honey.combinedBasisUSD, -r.honey.combinedBasisJPY);
+            document.getElementById('honeyGain').textContent = fmt(r.honey.gainUSD, r.honey.gainJPY);
+            document.getElementById('honeyDiff').textContent = fmt(r.honey.diffUSD, r.honey.diffJPY);
+            
+            // 10 Year 90%
+            document.getElementById('tentenTitle').textContent = '10 Year 90% - ' + r.tenTen.sc + '% Surrender Charge';
+            document.getElementById('tentenBasisOrig').textContent = fmt(r.tenTen.basisOrigUSD, r.tenTen.basisOrigJPY);
+            document.getElementById('tentenPremium').textContent = fmt(r.tenTen.premiumUSD, r.tenTen.premiumJPY);
+            document.getElementById('tentenBasis').textContent = fmt(r.tenTen.combinedBasisUSD, r.tenTen.combinedBasisJPY);
+            document.getElementById('tentenExistingCsv').textContent = fmt(r.tenTen.existingCsvUSD, r.tenTen.existingCsvJPY);
+            document.getElementById('tentenPpvaCsv').textContent = fmt(r.tenTen.ppvaCsvUSD, r.tenTen.ppvaCsvJPY);
+            document.getElementById('tentenCsv').textContent = fmt(r.tenTen.totalCsvUSD, r.tenTen.totalCsvJPY);
+            document.getElementById('tentenBasis2').textContent = fmt(-r.tenTen.combinedBasisUSD, -r.tenTen.combinedBasisJPY);
+            document.getElementById('tentenGain').textContent = fmt(r.tenTen.gainUSD, r.tenTen.gainJPY);
+            document.getElementById('tentenDiff').textContent = fmt(r.tenTen.diffUSD, r.tenTen.diffJPY);
+            
+            // Chart
+            barChart.data.datasets[0].data = showJPY ? 
+                [r.cr.gainJPY/1e6, r.goji.gainJPY/1e6, r.honey.gainJPY/1e6, r.tenTen.gainJPY/1e6] :
+                [r.cr.gainUSD/1e6, r.goji.gainUSD/1e6, r.honey.gainUSD/1e6, r.tenTen.gainUSD/1e6];
+            barChart.update();
+            
+            document.getElementById('barChartTitle').textContent = 'Gain Comparison (' + (showJPY ? 'JPY' : 'USD') + ')';
+            document.getElementById('scheduleTitle').textContent = 'Surrender Charge Schedule (Year ' + r.exitYear + ' highlighted)';
+            document.getElementById('scheduleTitleJP').textContent = '解約手数料スケジュール（' + r.exitYear + '年目をハイライト）';
+            
+            for (let i = 1; i <= 10; i++) {
+                document.getElementById('y' + i).className = (i == r.exitYear) ? 'highlight' : '';
+                ['d3', 'd4', 'd5'].forEach(d => { document.getElementById(d + 'y' + i).className = (i == r.exitYear) ? 'highlight' : ''; });
+            }
+        }
+        
+        function printSnapshot() {
+            const currentCSV = parseCurrency(document.getElementById('currentCSV').value);
+            const currentBasis = parseCurrency(document.getElementById('currentBasis').value);
+            const fxContribution = document.getElementById('fxContribution').value;
+            const fxCurrent = document.getElementById('fxCurrent').value;
+            const fxDissolution = document.getElementById('fxDissolution').value;
+            const csvGrowth = document.getElementById('csvGrowth').value;
+            const exitYear = document.getElementById('exitYear').value;
+            const newPremium = document.getElementById('newPremium').value;
+            
+            const params = `Current CSV: $${(currentCSV/1e6).toFixed(2)}M | Current Basis: $${(currentBasis/1e6).toFixed(2)}M | ` +
+                `FX Initial: ¥${fxContribution} | FX Current: ¥${fxCurrent} | FX Analysis Year: ¥${fxDissolution} | ` +
+                `Growth: ${csvGrowth}% | Year: ${exitYear} | New Premium: $${newPremium}M | ` +
+                `Display: ${showJPY ? 'JPY' : 'USD'}`;
+            
+            document.getElementById('printParams').textContent = params;
+            window.print();
+        }
+        
+        function toggleCurrency() {
+            showJPY = !showJPY;
+            const btn = document.getElementById('currencyToggle');
+            btn.textContent = 'Display Currency / 表示通貨: ' + (showJPY ? '¥ JPY' : '$ USD');
+            btn.className = 'toggle-btn ' + (showJPY ? 'jpy' : 'usd');
+            updateUI();
+        }
+        
+        document.querySelectorAll('input[type="range"]').forEach(i => i.addEventListener('input', updateUI));
+        document.querySelectorAll('.text-input').forEach(i => i.addEventListener('input', updateUI));
+        initChart();
+        updateUI();
+    </script>
+</body>
+</html>
