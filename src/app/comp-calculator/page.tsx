@@ -203,21 +203,26 @@ export default function CompCalculatorPage() {
 
         {/* Annual Recurring */}
         <Card title="Annual Recurring Charges" description="Fees deducted from fund value each year">
-          <div className="grid grid-cols-4 gap-4">
+          <div className="grid grid-cols-5 gap-4">
             <div className="bg-gray-50 rounded-lg p-4">
-              <p className="text-xs font-medium text-slate-brand uppercase">Advantage Fee</p>
-              <p className="mt-1 text-lg font-semibold text-navy">{formatCurrency(result.annualCharges.advantageFee)}</p>
-              <p className="text-xs text-slate-brand">15 bps</p>
+              <p className="text-xs font-medium text-slate-brand uppercase">Advantage M&E</p>
+              <p className="mt-1 text-lg font-semibold text-navy">{formatCurrency(result.annualCharges.advantageMeFee)}</p>
+              <p className="text-xs text-slate-brand">0.15%</p>
             </div>
             <div className="bg-gray-50 rounded-lg p-4">
-              <p className="text-xs font-medium text-slate-brand uppercase">3cStructures</p>
-              <p className="mt-1 text-lg font-semibold text-navy">{formatCurrency(result.annualCharges.threeCStructuresFee)}</p>
-              <p className="text-xs text-slate-brand">1.00%</p>
+              <p className="text-xs font-medium text-slate-brand uppercase">Investment Advisor</p>
+              <p className="mt-1 text-lg font-semibold text-navy">{formatCurrency(result.annualCharges.investmentAdvisorFee)}</p>
+              <p className="text-xs text-slate-brand">0.15%</p>
             </div>
             <div className="bg-gray-50 rounded-lg p-4">
-              <p className="text-xs font-medium text-slate-brand uppercase">M&E Charge</p>
-              <p className="mt-1 text-lg font-semibold text-navy">{formatCurrency(result.annualCharges.meFee)}</p>
-              <p className="text-xs text-slate-brand">15 bps</p>
+              <p className="text-xs font-medium text-slate-brand uppercase">Inspira Custodian</p>
+              <p className="mt-1 text-lg font-semibold text-navy">{formatCurrency(result.annualCharges.inspiraCustodianFee)}</p>
+              <p className="text-xs text-slate-brand">0.05%</p>
+            </div>
+            <div className="bg-gray-50 rounded-lg p-4">
+              <p className="text-xs font-medium text-slate-brand uppercase">Money Manager</p>
+              <p className="mt-1 text-lg font-semibold text-navy">{formatCurrency(result.annualCharges.moneyManagerFee)}</p>
+              <p className="text-xs text-slate-brand">configurable</p>
             </div>
             <div className="bg-navy rounded-lg p-4">
               <p className="text-xs font-medium text-white/80 uppercase">Total Annual</p>

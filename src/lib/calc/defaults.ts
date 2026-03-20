@@ -72,9 +72,10 @@ export const DEFAULT_DEAL_INPUTS: DealInputs = {
 
   fundAllocations: DEFAULT_FUND_PRODUCTS,
 
-  advantageFeeBps: 15, // 15 bps = 0.15%
-  threeCStructuresAnnualPct: 0.01,
-  meChargePct: 0.0015, // 15 bps M&E
+  advantageMePct: 0.0015,        // 0.15% — Advantage M&E
+  investmentAdvisorPct: 0.0015,  // 0.15% — Syndicated/Stephen RIA
+  inspiraCustodianPct: 0.0005,   // 0.05% — Inspira Custodian
+  moneyManagerPct: 0,            // 0% — set when money manager engaged
 
   clientAge: 50,
   clientGender: "M",

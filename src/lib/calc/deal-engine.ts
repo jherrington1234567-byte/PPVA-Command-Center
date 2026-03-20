@@ -16,12 +16,7 @@ export function calculateDeal(inputs: DealInputs): DealResult {
   );
 
   // Step 4: Annual charges (based on initial fund value)
-  const annualCharges = calculateAnnualCharges(
-    waterfall.netToFund,
-    inputs.advantageFeeBps,
-    inputs.threeCStructuresAnnualPct,
-    inputs.meChargePct
-  );
+  const annualCharges = calculateAnnualCharges(waterfall.netToFund, inputs);
 
   // Step 5: Carrier illustration (year-by-year projection)
   const carrierIllustration = calculateCarrierIllustration(

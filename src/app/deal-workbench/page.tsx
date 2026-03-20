@@ -27,19 +27,24 @@ function AnnualChargesDisplay({ charges }: { charges: AnnualChargesResult }) {
         </thead>
         <tbody>
           <tr className="border-b border-gray-100">
-            <td className="py-2 px-3">Advantage Admin Fee</td>
-            <td className="py-2 px-3 text-right font-mono">{formatCurrency(charges.advantageFee)}</td>
-            <td className="py-2 px-3 text-right font-mono text-slate-brand">15 bps</td>
+            <td className="py-2 px-3">Advantage M&E</td>
+            <td className="py-2 px-3 text-right font-mono">{formatCurrency(charges.advantageMeFee)}</td>
+            <td className="py-2 px-3 text-right font-mono text-slate-brand">0.15%</td>
           </tr>
           <tr className="border-b border-gray-100">
-            <td className="py-2 px-3">3cStructures Annual</td>
-            <td className="py-2 px-3 text-right font-mono">{formatCurrency(charges.threeCStructuresFee)}</td>
-            <td className="py-2 px-3 text-right font-mono text-slate-brand">1.00%</td>
+            <td className="py-2 px-3">Investment Advisor (RIA)</td>
+            <td className="py-2 px-3 text-right font-mono">{formatCurrency(charges.investmentAdvisorFee)}</td>
+            <td className="py-2 px-3 text-right font-mono text-slate-brand">0.15%</td>
           </tr>
           <tr className="border-b border-gray-100">
-            <td className="py-2 px-3">M&E Charge</td>
-            <td className="py-2 px-3 text-right font-mono">{formatCurrency(charges.meFee)}</td>
-            <td className="py-2 px-3 text-right font-mono text-slate-brand">15 bps</td>
+            <td className="py-2 px-3">Inspira Custodian</td>
+            <td className="py-2 px-3 text-right font-mono">{formatCurrency(charges.inspiraCustodianFee)}</td>
+            <td className="py-2 px-3 text-right font-mono text-slate-brand">0.05%</td>
+          </tr>
+          <tr className="border-b border-gray-100">
+            <td className="py-2 px-3">Money Manager</td>
+            <td className="py-2 px-3 text-right font-mono">{formatCurrency(charges.moneyManagerFee)}</td>
+            <td className="py-2 px-3 text-right font-mono text-slate-brand">configurable</td>
           </tr>
         </tbody>
         <tfoot>

@@ -26,10 +26,11 @@ export interface DealInputs {
   // Fund allocations
   fundAllocations: FundProduct[];
 
-  // Annual charges
-  advantageFeeBps: number;
-  threeCStructuresAnnualPct: number;
-  meChargePct: number;
+  // Annual charges (ongoing, applied to fund value each year)
+  advantageMePct: number;        // Advantage M&E: 0.15%
+  investmentAdvisorPct: number;  // Syndicated/Stephen RIA: 0.15%
+  inspiraCustodianPct: number;   // Inspira Custodian: 0.05%
+  moneyManagerPct: number;       // Money Manager: 0% default, configurable
 
   // Client demographics
   clientAge: number;
@@ -84,9 +85,10 @@ export interface FundAllocationResult {
 }
 
 export interface AnnualChargesResult {
-  advantageFee: number;
-  threeCStructuresFee: number;
-  meFee: number;
+  advantageMeFee: number;
+  investmentAdvisorFee: number;
+  inspiraCustodianFee: number;
+  moneyManagerFee: number;
   totalAnnualCharge: number;
   totalAnnualChargePct: number;
 }

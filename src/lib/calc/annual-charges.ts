@@ -1,21 +1,21 @@
-import { AnnualChargesResult } from "./types";
+import { DealInputs, AnnualChargesResult } from "./types";
 
 export function calculateAnnualCharges(
   fundValue: number,
-  advantageFeeBps: number,
-  threeCStructuresAnnualPct: number,
-  meChargePct: number
+  inputs: DealInputs
 ): AnnualChargesResult {
-  const advantageFee = fundValue * (advantageFeeBps / 10000);
-  const threeCStructuresFee = fundValue * threeCStructuresAnnualPct;
-  const meFee = fundValue * meChargePct;
-  const totalAnnualCharge = advantageFee + threeCStructuresFee + meFee;
+  const advantageMeFee = fundValue * inputs.advantageMePct;
+  const investmentAdvisorFee = fundValue * inputs.investmentAdvisorPct;
+  const inspiraCustodianFee = fundValue * inputs.inspiraCustodianPct;
+  const moneyManagerFee = fundValue * inputs.moneyManagerPct;
+  const totalAnnualCharge = advantageMeFee + investmentAdvisorFee + inspiraCustodianFee + moneyManagerFee;
   const totalAnnualChargePct = fundValue > 0 ? totalAnnualCharge / fundValue : 0;
 
   return {
-    advantageFee,
-    threeCStructuresFee,
-    meFee,
+    advantageMeFee,
+    investmentAdvisorFee,
+    inspiraCustodianFee,
+    moneyManagerFee,
     totalAnnualCharge,
     totalAnnualChargePct,
   };

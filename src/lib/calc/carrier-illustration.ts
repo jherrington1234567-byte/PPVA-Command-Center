@@ -9,9 +9,10 @@ export function calculateCarrierIllustration(
   const { projectionYears, illustratedRates, clientAge } = inputs;
   const [rateLow, rateMid, rateHigh] = illustratedRates;
   const annualFeePct =
-    inputs.advantageFeeBps / 10000 +
-    inputs.threeCStructuresAnnualPct +
-    inputs.meChargePct;
+    inputs.advantageMePct +
+    inputs.investmentAdvisorPct +
+    inputs.inspiraCustodianPct +
+    inputs.moneyManagerPct;
   const baseAdminFee = inputs.advantageAdminFee;
 
   const years: CarrierIllustrationYear[] = [];
@@ -32,18 +33,15 @@ export function calculateCarrierIllustration(
     const fundValueMid = afterFeesMid * (1 + rateMid);
     const fundValueHigh = afterFeesHigh * (1 + rateHigh);
 
-    // Surrender value = fund value (no surrender charge schedule modeled in Sprint 1)
     const surrenderValueLow = fundValueLow;
     const surrenderValueMid = fundValueMid;
     const surrenderValueHigh = fundValueHigh;
 
-    // Death benefit = max of fund value and net deposit
     const deathBenefitLow = Math.max(fundValueLow, netToFund);
     const deathBenefitMid = Math.max(fundValueMid, netToFund);
     const deathBenefitHigh = Math.max(fundValueHigh, netToFund);
 
-    const annualFeesDeducted =
-      prevMid * annualFeePct + adminFeeThisYear;
+    const annualFeesDeducted = prevMid * annualFeePct + adminFeeThisYear;
 
     years.push({
       year: y,
