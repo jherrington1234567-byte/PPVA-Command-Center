@@ -2,13 +2,13 @@
 
 ## Overview
 
-This document provides a comprehensive breakdown of all 15 steps required to execute the Advantage annuity structure with SMA deployment for Mr. Takata's Hawaiian LLC. Each step includes owners, timing, prerequisites, and current status where applicable.
+This document provides a comprehensive breakdown of all 15 steps required to execute the Advantage annuity structure with SMA deployment for the Client's domestic LLC. Each step includes owners, timing, prerequisites, and current status where applicable.
 
 ---
 
 ## Phase 0: Coordination & Preparation (Steps 1-4)
 
-### Step 1: Confirm Mr. Takata and advisers want to move forward
+### Step 1: Confirm the Client and advisers want to move forward
 **Status**: ✅ Done  
 **Owners**: TPBC, Stephen  
 **Activities**:
@@ -20,7 +20,7 @@ This document provides a comprehensive breakdown of all 15 steps required to exe
 
 ---
 
-### Step 2: Gather all data and documents for Mr. Takata and Hawaiian LLC
+### Step 2: Gather all data and documents for the Client and domestic LLC
 **Status**: 🔄 In Process  
 **Owners**: TPBC, Stephen  
 **Activities**:
@@ -100,13 +100,13 @@ This document provides a comprehensive breakdown of all 15 steps required to exe
 
 ---
 
-### Step 7: Mr. Takata signs DocuSign
+### Step 7: the Client signs DocuSign
 **Target**: Thursday or Friday  
 **Primary Owner**: Heath Miller (3cStructures)  
 **Support**: Sam (3cStructures)  
 **Prerequisites**: Step 6 completed  
 **Activities**:
-- Heath Miller oversees Mr. Takata DocuSign execution
+- Heath Miller oversees the Client DocuSign execution
 - Client signs annuity application
 - Client signs all supporting documents
 - Heath routes signed documents to PR counsel
@@ -114,7 +114,7 @@ This document provides a comprehensive breakdown of all 15 steps required to exe
 - Heath forwards approved documents to Advantage
 
 **Workflow**:
-1. Mr. Takata executes DocuSign
+1. the Client executes DocuSign
 2. Documents → PR counsel
 3. PR counsel review (3cStructures oversight)
 4. Documents → Advantage (DeAnn Diaz)
@@ -187,7 +187,7 @@ This document provides a comprehensive breakdown of all 15 steps required to exe
 **Activities**:
 - DeAnn and Stephen issue approval to fund the account
 - DeAnn sends wiring instructions to Stephen and TPBC
-- Stephen coordinates with Mr. Takata for wire transfer
+- Stephen coordinates with the Client for wire transfer
 - Client wires funds per instructions
 
 **Outcome**: Greenlight issued, wiring instructions distributed, wire in process
@@ -245,7 +245,7 @@ This document provides a comprehensive breakdown of all 15 steps required to exe
 - Advantage issues PDF policy document
 - DeAnn sends policy to Stephen
 - Stephen reviews policy
-- Stephen forwards policy to Mr. Takata
+- Stephen forwards policy to the Client
 - Confirm client receipt
 
 **Outcome**: Policy document delivered to client
