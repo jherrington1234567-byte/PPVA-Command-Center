@@ -16,15 +16,16 @@ const DOCUMENTS: DocRequirement[] = [
   { document: "Annuity Application", requiredBy: "Carrier", whoCompletes: "3cStructures", whoSigns: "Client", routing: "Client → PR Counsel → 3cStructures → Advantage", caseTypes: ["individual", "llc", "trust", "international"] },
   { document: "Client Identification (Passport/ID)", requiredBy: "KYC/AML", whoCompletes: "Client", whoSigns: "N/A", routing: "Uploaded to secure portal", caseTypes: ["individual", "llc", "trust", "international"] },
   { document: "Source of Funds Statement", requiredBy: "AML Compliance", whoCompletes: "Client", whoSigns: "Client", routing: "Submitted with application", caseTypes: ["individual", "llc", "trust", "international"] },
+  { document: "Bank Statements (3 months)", requiredBy: "AML Compliance", whoCompletes: "Client", whoSigns: "N/A", routing: "Uploaded to secure portal", caseTypes: ["individual", "llc", "trust", "international"] },
   { document: "Trust Agreement (Certified Copy)", requiredBy: "Carrier", whoCompletes: "Client Attorney", whoSigns: "Trustee", routing: "Uploaded to secure portal", caseTypes: ["trust"] },
   { document: "LLC Operating Agreement", requiredBy: "Carrier", whoCompletes: "Client Attorney", whoSigns: "Members", routing: "Uploaded to secure portal", caseTypes: ["llc"] },
-  { document: "Discretionary Management Agreement", requiredBy: "RIA Compliance", whoCompletes: "TPBC", whoSigns: "Stephen, Advantage", routing: "Internal execution", caseTypes: ["individual", "llc", "trust", "international"] },
-  { document: "No Client Control Affirmation", requiredBy: "Investor Control", whoCompletes: "TPBC", whoSigns: "Stephen", routing: "Filed with carrier", caseTypes: ["individual", "llc", "trust", "international"] },
+  { document: "Discretionary Management Agreement", requiredBy: "RIA Compliance", whoCompletes: "TPBC", whoSigns: "RIA, Advantage", routing: "Internal execution", caseTypes: ["individual", "llc", "trust", "international"] },
+  { document: "No Client Control Affirmation", requiredBy: "Investor Control", whoCompletes: "TPBC", whoSigns: "RIA", routing: "Filed with carrier", caseTypes: ["individual", "llc", "trust", "international"] },
   { document: "Address Verification", requiredBy: "KYC", whoCompletes: "Client", whoSigns: "N/A", routing: "Uploaded to secure portal", caseTypes: ["individual", "llc", "trust", "international"] },
   { document: "W-8BEN / W-8BEN-E", requiredBy: "Tax Reporting", whoCompletes: "Client", whoSigns: "Client", routing: "Filed with custodian", caseTypes: ["international"] },
   { document: "Due Diligence Questionnaire", requiredBy: "Carrier Compliance", whoCompletes: "TPBC", whoSigns: "N/A", routing: "Submitted to Advantage", caseTypes: ["individual", "llc", "trust", "international"] },
   { document: "Wiring Instructions", requiredBy: "Funding", whoCompletes: "Advantage", whoSigns: "N/A", routing: "Sent to client/advisor", caseTypes: ["individual", "llc", "trust", "international"] },
-  { document: "Policy Document (PDF)", requiredBy: "Delivery", whoCompletes: "Advantage", whoSigns: "N/A", routing: "Advantage → Stephen → Client", caseTypes: ["individual", "llc", "trust", "international"] },
+  { document: "Policy Document (PDF)", requiredBy: "Delivery", whoCompletes: "Advantage", whoSigns: "N/A", routing: "Advantage → RIA → Client", caseTypes: ["individual", "llc", "trust", "international"] },
 ];
 
 export function DocumentMatrix() {

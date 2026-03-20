@@ -24,8 +24,8 @@ const WATERFALL_COLORS = [
   "#003661", // navy - Total Deposit
   "#0086A3", // teal - Premium Load
   "#00ADEE", // sky - 3cStructures
-  "#00ADEE", // sky - Syndicated Capital
-  "#4C5C68", // slate - PB Investment Services
+  "#00ADEE", // sky - B/D Holdback
+  "#4C5C68", // slate - OSJ Holdback
   "#0086A3", // teal - PBWR
   "#4C5C68", // slate - Ohana
   "#46494C", // dark gray - Admin
@@ -41,8 +41,8 @@ export default function CompCalculatorPage() {
   const waterfallData = [
     { name: "Premium Load", value: w.grossPremiumLoad },
     { name: "3cStructures (one-time)", value: w.threeCStructuresAmount },
-    { name: "Syndicated Capital", value: w.syndicatedHoldback },
-    { name: "PB Investment Services", value: w.pbInvestmentHoldback },
+    { name: "B/D Holdback", value: w.syndicatedHoldback },
+    { name: "OSJ Holdback", value: w.pbInvestmentHoldback },
     { name: "PBWR Share", value: w.pbwrShare },
     { name: "Ohana Share", value: w.ohanaShare },
     { name: "Advantage Admin", value: w.adminFees },
@@ -126,8 +126,8 @@ export default function CompCalculatorPage() {
               <tbody>
                 {[
                   { party: "3cStructures (one-time)", amount: w.threeCStructuresAmount },
-                  { party: "Syndicated Capital", amount: w.syndicatedHoldback },
-                  { party: "PB Investment Services", amount: w.pbInvestmentHoldback },
+                  { party: "B/D Holdback", amount: w.syndicatedHoldback },
+                  { party: "OSJ Holdback", amount: w.pbInvestmentHoldback },
                   { party: "PBWR", amount: w.pbwrShare },
                   { party: "Ohana", amount: w.ohanaShare },
                   { party: "Advantage (Admin Fee)", amount: w.adminFees },
@@ -158,18 +158,18 @@ export default function CompCalculatorPage() {
           </Card>
         </div>
 
-        {/* Per-Product Commissions */}
-        <Card title="Per-Product Commissions" description="Commission breakdown by fund product">
+        {/* Per-Product Marketing Allowance */}
+        <Card title="Per-Product Marketing Allowance" description="Marketing allowance breakdown by fund product">
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b-2 border-navy">
                 <th className="text-left py-2 px-3 text-navy font-semibold">Product</th>
                 <th className="text-right py-2 px-3 text-navy font-semibold">Allocation</th>
                 <th className="text-right py-2 px-3 text-navy font-semibold">Amount</th>
-                <th className="text-right py-2 px-3 text-navy font-semibold">OGA</th>
+                <th className="text-right py-2 px-3 text-navy font-semibold">OGA Allowance</th>
                 <th className="text-right py-2 px-3 text-navy font-semibold">Processor (95%)</th>
                 <th className="text-right py-2 px-3 text-navy font-semibold">Regional</th>
-                <th className="text-right py-2 px-3 text-navy font-semibold">Total Comm.</th>
+                <th className="text-right py-2 px-3 text-navy font-semibold">Total Allowance</th>
               </tr>
             </thead>
             <tbody>
@@ -189,7 +189,7 @@ export default function CompCalculatorPage() {
             </tbody>
             <tfoot>
               <tr className="border-t-2 border-navy font-semibold">
-                <td className="py-2 px-3" colSpan={3}>Total Commissions</td>
+                <td className="py-2 px-3" colSpan={3}>Total Marketing Allowance</td>
                 <td className="py-2 px-3 text-right font-mono">{formatCurrency(result.fundAllocation.totalOgaCommission)}</td>
                 <td className="py-2 px-3 text-right font-mono">{formatCurrency(result.fundAllocation.totalProcessorCommission)}</td>
                 <td className="py-2 px-3 text-right font-mono">{formatCurrency(result.fundAllocation.totalRegionalCommission)}</td>
@@ -210,28 +210,28 @@ export default function CompCalculatorPage() {
               value={inputs.advantageMePct}
               onChange={(v) => updateField("advantageMePct", v)}
               format="percent"
-              step={0.0001}
+              step={0.05}
             />
             <NumberInput
               label="Investment Advisor Fee"
               value={inputs.investmentAdvisorPct}
               onChange={(v) => updateField("investmentAdvisorPct", v)}
               format="percent"
-              step={0.0001}
+              step={0.05}
             />
             <NumberInput
               label="Money Manager Fee"
               value={inputs.moneyManagerPct}
               onChange={(v) => updateField("moneyManagerPct", v)}
               format="percent"
-              step={0.0001}
+              step={0.05}
             />
             <NumberInput
               label="Inspira Custodian Fee"
               value={inputs.inspiraCustodianPct}
               onChange={(v) => updateField("inspiraCustodianPct", v)}
               format="percent"
-              step={0.0001}
+              step={0.05}
             />
           </div>
 

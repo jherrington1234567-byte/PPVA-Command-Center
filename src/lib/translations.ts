@@ -22,7 +22,7 @@ const dict = {
   // Tabs
   waterfall: { en: "Waterfall", ja: "ウォーターフォール" },
   fundAllocation: { en: "Fund Allocation", ja: "ファンド配分" },
-  carrierIllustration: { en: "Carrier Illustration", ja: "キャリアイラストレーション" },
+  carrierIllustration: { en: "Generic Illustration", ja: "一般イラストレーション" },
   taxImpact: { en: "Tax Impact", ja: "税務インパクト" },
 
   // Summary cards
@@ -40,8 +40,8 @@ const dict = {
   premiumStructure: { en: "Premium Structure", ja: "保険料構成" },
   premiumLoad: { en: "Premium Load", ja: "プレミアムロード" },
   threeCStructuresOneTime: { en: "3cStructures (one-time)", ja: "3cStructures（一回払い）" },
-  syndicatedHoldback: { en: "Syndicated Holdback", ja: "シンジケートホールドバック" },
-  pbInvestmentHoldback: { en: "PB Investment Holdback", ja: "PB投資ホールドバック" },
+  syndicatedHoldback: { en: "B/D Holdback", ja: "B/Dホールドバック" },
+  pbInvestmentHoldback: { en: "OSJ Holdback", ja: "OSJホールドバック" },
   pbwrSplit: { en: "PBWR Split", ja: "PBWRスプリット" },
   advantageAdminFee: { en: "Advantage Admin Fee", ja: "Advantage管理手数料" },
   miscFees: { en: "Misc Fees", ja: "その他手数料" },
@@ -92,7 +92,7 @@ const dict = {
   // Waterfall labels
   premiumLoadGross: { en: "Premium Load (Gross)", ja: "プレミアムロード（総額）" },
   threeCStructuresLoad: { en: "3cStructures Load", ja: "3cStructuresロード" },
-  syndicatedCapitalHoldback: { en: "Syndicated Capital Holdback", ja: "シンジケート資本ホールドバック" },
+  syndicatedCapitalHoldback: { en: "B/D Holdback", ja: "B/Dホールドバック" },
   netToStephen: { en: "Net to Stephen", ja: "スティーブンへの純額" },
   netToPBWR: { en: "Net to PBWR", ja: "PBWRへの純額" },
   pbwrShare: { en: "PBWR Share (50%)", ja: "PBWRシェア（50%）" },
@@ -109,12 +109,12 @@ const dict = {
   product: { en: "Product", ja: "商品" },
   type: { en: "Type", ja: "種別" },
   amount: { en: "Amount", ja: "金額" },
-  ogaComm: { en: "OGA Comm.", ja: "OGA手数料" },
+  ogaComm: { en: "OGA Allowance", ja: "OGAアローワンス" },
   processor: { en: "Processor", ja: "プロセッサー" },
   regional: { en: "Regional", ja: "地域" },
   guar: { en: "Guar.", ja: "保証" },
   nonG: { en: "Non-G.", ja: "非保証" },
-  productAllocation: { en: "Product allocation, estimated returns, and commissions", ja: "商品配分、予想リターン、手数料" },
+  productAllocation: { en: "Product allocation, estimated returns, and marketing allowance", ja: "商品配分、予想リターン、マーケティングアローワンス" },
 
   // Carrier illustration
   year: { en: "Year", ja: "年" },

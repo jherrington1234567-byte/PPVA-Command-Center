@@ -143,28 +143,28 @@ export function DealInputsPanel({ inputs, onUpdateField, onUpdateFund }: DealInp
             value={inputs.advantageMePct}
             onChange={(v) => onUpdateField("advantageMePct", v)}
             format="percent"
-            step={0.0001}
+            step={0.05}
           />
           <NumberInput
             label={t("investmentAdvisor", lang)}
             value={inputs.investmentAdvisorPct}
             onChange={(v) => onUpdateField("investmentAdvisorPct", v)}
             format="percent"
-            step={0.0001}
+            step={0.05}
           />
           <NumberInput
             label={t("moneyManager", lang)}
             value={inputs.moneyManagerPct}
             onChange={(v) => onUpdateField("moneyManagerPct", v)}
             format="percent"
-            step={0.0001}
+            step={0.05}
           />
           <NumberInput
             label={t("inspiraCustodian", lang)}
             value={inputs.inspiraCustodianPct}
             onChange={(v) => onUpdateField("inspiraCustodianPct", v)}
             format="percent"
-            step={0.0001}
+            step={0.05}
           />
         </div>
       </section>
