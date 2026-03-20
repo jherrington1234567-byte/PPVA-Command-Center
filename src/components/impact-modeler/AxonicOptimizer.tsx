@@ -175,7 +175,7 @@ export function AxonicOptimizer() {
         </Card>
 
         {/* Historical Stress Test */}
-        <Card title="Historical Stress Test (2000-2024)" description="How each allocation would have performed through actual S&P returns">
+        <Card title="Historical Stress Test (2000-2009)" description="Dot-com crash through financial crisis — how each allocation would have performed through actual S&P returns">
           <div className="h-72">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={stressData.slice(0, 10)} margin={{ top: 10, right: 20, bottom: 5, left: 20 }}>
