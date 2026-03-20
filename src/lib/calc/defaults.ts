@@ -77,6 +77,8 @@ export const DEFAULT_DEAL_INPUTS: DealInputs = {
   inspiraCustodianPct: 0.0005,   // 0.05% — Inspira Custodian
   moneyManagerPct: 0,            // 0% — set when money manager engaged
 
+  language: "both",
+
   clientAge: 50,
   clientGender: "M",
   currentCSV: 2_000_000,

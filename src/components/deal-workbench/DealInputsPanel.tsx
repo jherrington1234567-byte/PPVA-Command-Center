@@ -208,18 +208,22 @@ export function DealInputsPanel({ inputs, onUpdateField, onUpdateFund }: DealInp
             onChange={(v) => onUpdateField("csvGrowthRate", v)}
             format="percent"
           />
-          <NumberInput
-            label="Tax Rate (Japan)"
-            value={inputs.japaneseTaxRate}
-            onChange={(v) => onUpdateField("japaneseTaxRate", v)}
-            format="percent"
-          />
-          <NumberInput
-            label="JPY/USD Rate"
-            value={inputs.jpyUsdRate}
-            onChange={(v) => onUpdateField("jpyUsdRate", v)}
-            prefix="¥"
-          />
+          {inputs.language !== "english" && (
+            <>
+              <NumberInput
+                label="Tax Rate (Japan)"
+                value={inputs.japaneseTaxRate}
+                onChange={(v) => onUpdateField("japaneseTaxRate", v)}
+                format="percent"
+              />
+              <NumberInput
+                label="JPY/USD Rate"
+                value={inputs.jpyUsdRate}
+                onChange={(v) => onUpdateField("jpyUsdRate", v)}
+                prefix="¥"
+              />
+            </>
+          )}
         </div>
       </section>
 

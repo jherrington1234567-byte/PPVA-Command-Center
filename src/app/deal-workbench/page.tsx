@@ -12,7 +12,14 @@ import { Card } from "@/components/ui/Card";
 import { useDealInputs } from "@/hooks/useDealInputs";
 import { useDealCalculation } from "@/hooks/useDealCalculation";
 import { formatCurrency, formatPercent } from "@/lib/format";
-import { AnnualChargesResult } from "@/lib/calc/types";
+import { AnnualChargesResult, DealInputs } from "@/lib/calc/types";
+import { Button } from "@/components/ui/Button";
+
+const LANGUAGE_OPTIONS: { value: DealInputs["language"]; label: string }[] = [
+  { value: "english", label: "English" },
+  { value: "japanese", label: "Japanese" },
+  { value: "both", label: "Both" },
+];
 
 function AnnualChargesDisplay({ charges }: { charges: AnnualChargesResult }) {
   return (
@@ -97,7 +104,7 @@ export default function DealWorkbenchPage() {
       label: "Tax Impact",
       content: (
         <Card title="Tax Impact Analysis" description="Existing portfolio vs. PPVA — tax deferral benefit">
-          <TaxImpactPanel taxImpact={result.taxImpact} jpyUsdRate={inputs.jpyUsdRate} />
+          <TaxImpactPanel taxImpact={result.taxImpact} jpyUsdRate={inputs.jpyUsdRate} language={inputs.language} />
         </Card>
       ),
     },
@@ -121,6 +128,20 @@ export default function DealWorkbenchPage() {
 
         {/* Results Area */}
         <div className="flex-1 overflow-y-auto p-6 space-y-6">
+          {/* Language Mode Toggle */}
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-medium text-slate-brand mr-2">Language Mode:</span>
+            {LANGUAGE_OPTIONS.map((opt) => (
+              <Button
+                key={opt.value}
+                variant={inputs.language === opt.value ? "primary" : "secondary"}
+                size="sm"
+                onClick={() => updateField("language", opt.value)}
+              >
+                {opt.label}
+              </Button>
+            ))}
+          </div>
           <DealSummaryCards summary={result.summary} />
           <Tabs tabs={tabs} />
         </div>

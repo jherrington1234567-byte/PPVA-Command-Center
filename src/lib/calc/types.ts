@@ -32,6 +32,9 @@ export interface DealInputs {
   inspiraCustodianPct: number;   // Inspira Custodian: 0.05%
   moneyManagerPct: number;       // Money Manager: 0% default, configurable
 
+  // Language mode
+  language: "english" | "japanese" | "both";
+
   // Client demographics
   clientAge: number;
   clientGender: "M" | "F";
