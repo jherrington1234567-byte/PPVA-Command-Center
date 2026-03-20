@@ -72,6 +72,9 @@ export const DEFAULT_DEAL_INPUTS: DealInputs = {
 
   fundAllocations: DEFAULT_FUND_PRODUCTS,
 
+  portfolioFunds: [],
+  usePortfolioReturn: false,
+
   advantageMePct: 0.0015,        // 0.15% — Advantage M&E
   investmentAdvisorPct: 0.0015,  // 0.15% — Syndicated/Stephen RIA
   inspiraCustodianPct: 0.0005,   // 0.05% — Inspira Custodian

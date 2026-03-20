@@ -8,6 +8,19 @@ export interface FundProduct {
   regionalPct: number;
 }
 
+/** A fund selected from the Portfolio Builder (Crystal/SALI/Custom) */
+export interface PortfolioFundEntry {
+  id: string;
+  name: string;
+  source: "crystal" | "sali" | "custom";
+  strategy: string;
+  allocationPct: number;         // decimal within non-guaranteed sleeve
+  expectedReturn: number;        // decimal
+  historicalVolatility: number;   // decimal
+  managementFeePct: number;      // decimal
+  performanceFeePct: number;     // decimal
+}
+
 export interface DealInputs {
   // Policy basics
   policyOwner: string;
@@ -23,8 +36,15 @@ export interface DealInputs {
   advantageAdminFee: number;
   miscFees: number;
 
-  // Fund allocations
+  // Fund allocations (guaranteed + non-guaranteed product buckets)
   fundAllocations: FundProduct[];
+
+  // Portfolio Builder selections (non-guaranteed sleeve detail)
+  portfolioFunds: PortfolioFundEntry[];
+
+  // When true, the portfolio builder's blended return overrides
+  // the non-guaranteed fund estimated rates and the illustrated mid rate
+  usePortfolioReturn: boolean;
 
   // Annual charges (ongoing, applied to fund value each year)
   advantageMePct: number;        // Advantage M&E: 0.15%
