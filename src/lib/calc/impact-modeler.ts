@@ -87,28 +87,45 @@ export interface CrossBorderInputs {
 export interface CrossBorderScenario {
   name: string;
   surrenderSchedule: number[];
+  surrenderChargePct: number;
   ppvaNetPremium: number;
-  ppvaCSV: number;
-  totalCSV: number;
-  totalBasis: number;
-  totalGain: number;
-  gainReduction: number;
+  ppvaCsvUsd: number;
+  ppvaCsvJpy: number;
+  // Basis
+  basisOrigUsd: number;
+  basisOrigJpy: number;
+  premiumUsd: number;
+  premiumJpy: number;
+  combinedBasisUsd: number;
+  combinedBasisJpy: number;
+  // CSV
+  existingCsvUsd: number;
+  existingCsvJpy: number;
+  totalCsvUsd: number;
+  totalCsvJpy: number;
+  // Gain — computed in JPY first (tax jurisdiction), then converted
+  gainJpy: number;
+  gainUsd: number;
+  // Value difference vs current reality
+  valueDiffJpy: number;
+  valueDiffUsd: number;
 }
 
 export interface CrossBorderResult {
   // Current reality (no PPVA)
-  existingCSV: number;
-  existingGain: number;
-  existingGainJpy: number;
-  existingTax: number;
-  existingTaxJpy: number;
+  crBasisUsd: number;
+  crBasisJpy: number;
+  crGrowthUsd: number;
+  crGrowthJpy: number;
+  crFxImpactUsd: number;
+  crFxImpactJpy: number;
+  crCsvUsd: number;
+  crCsvJpy: number;
+  crGainJpy: number;
+  crGainUsd: number;
 
   // Scenarios
   scenarios: CrossBorderScenario[];
-
-  // JPY values
-  existingCSVJpy: number;
-  existingBasisJpy: number;
 }
 
 const SURRENDER_SCHEDULES: Record<string, number[]> = {
@@ -121,54 +138,91 @@ export function calculateCrossBorder(inputs: CrossBorderInputs): CrossBorderResu
   const {
     currentCSV, costBasis, fxRateAtContribution, currentFxRate,
     fxRateAtAnalysis, csvGrowthRate, analysisYear, newPPVAPremium,
-    premiumChargePct, japaneseTaxRate,
+    premiumChargePct,
   } = inputs;
 
-  // Project existing CSV
-  const existingCSV = currentCSV * Math.pow(1 + csvGrowthRate, analysisYear);
-  const existingGain = Math.max(0, existingCSV - costBasis);
-  const existingTax = existingGain * japaneseTaxRate;
+  const growthFactor = Math.pow(1 + csvGrowthRate, analysisYear);
 
-  // JPY conversions
-  const existingCSVJpy = existingCSV * fxRateAtAnalysis;
-  const existingBasisJpy = costBasis * fxRateAtContribution;
-  const existingGainJpy = Math.max(0, existingCSVJpy - existingBasisJpy);
-  const existingTaxJpy = existingGainJpy * japaneseTaxRate;
+  // === Current Reality (no PPVA) ===
+  const crBasisUsd = costBasis;
+  const crBasisJpy = costBasis * fxRateAtContribution;
+  const crGrowthUsd = currentCSV * (growthFactor - 1);
+  const crGrowthJpy = crGrowthUsd * fxRateAtAnalysis;
+  const crCsvUsd = currentCSV * growthFactor;
+  const crCsvJpy = crCsvUsd * fxRateAtAnalysis;
+  const crFxImpactJpy = crCsvUsd * (fxRateAtAnalysis - fxRateAtContribution);
+  const crFxImpactUsd = crFxImpactJpy / fxRateAtAnalysis;
+  // Gain computed in JPY first (Japanese tax jurisdiction), then back to USD
+  const crGainJpy = crCsvJpy - crBasisJpy;
+  const crGainUsd = crGainJpy / fxRateAtAnalysis;
 
-  // Build scenarios
+  // === PPVA Design Scenarios ===
   const scenarios: CrossBorderScenario[] = Object.entries(SURRENDER_SCHEDULES).map(
     ([name, schedule]) => {
       const ppvaNetPremium = newPPVAPremium * (1 - premiumChargePct);
-      const grownValue = ppvaNetPremium * Math.pow(1 + csvGrowthRate, analysisYear);
-      const surrenderCharge = analysisYear <= schedule.length ? schedule[analysisYear - 1] : 0;
-      const ppvaCSV = grownValue * (1 - surrenderCharge);
+      const surrenderChargePct = analysisYear <= schedule.length ? schedule[analysisYear - 1] : 0;
+      const ppvaAccumUsd = ppvaNetPremium * growthFactor;
+      const ppvaCsvUsd = ppvaAccumUsd * (1 - surrenderChargePct);
+      const ppvaCsvJpy = ppvaCsvUsd * fxRateAtAnalysis;
 
-      const totalCSV = existingCSV + ppvaCSV;
-      const totalBasis = costBasis + newPPVAPremium;
-      const totalGain = Math.max(0, totalCSV - totalBasis);
-      const gainReduction = existingGain - totalGain;
+      // Basis: original at contribution FX, new premium at current FX
+      const basisOrigUsd = costBasis;
+      const basisOrigJpy = costBasis * fxRateAtContribution;
+      const premiumUsd = newPPVAPremium;
+      const premiumJpy = newPPVAPremium * currentFxRate;
+      const combinedBasisUsd = basisOrigUsd + premiumUsd;
+      const combinedBasisJpy = basisOrigJpy + premiumJpy;
+
+      // CSV
+      const existingCsvUsd = crCsvUsd;
+      const existingCsvJpy = crCsvJpy;
+      const totalCsvUsd = existingCsvUsd + ppvaCsvUsd;
+      const totalCsvJpy = totalCsvUsd * fxRateAtAnalysis;
+
+      // Gain in JPY first (tax jurisdiction), then convert to USD
+      const gainJpy = totalCsvJpy - combinedBasisJpy;
+      const gainUsd = gainJpy / fxRateAtAnalysis;
+
+      // Value difference: how much less gain vs current reality
+      const valueDiffJpy = crGainJpy - gainJpy;
+      const valueDiffUsd = crGainUsd - gainUsd;
 
       return {
         name,
         surrenderSchedule: schedule,
+        surrenderChargePct,
         ppvaNetPremium,
-        ppvaCSV,
-        totalCSV,
-        totalBasis,
-        totalGain,
-        gainReduction,
+        ppvaCsvUsd,
+        ppvaCsvJpy,
+        basisOrigUsd,
+        basisOrigJpy,
+        premiumUsd,
+        premiumJpy,
+        combinedBasisUsd,
+        combinedBasisJpy,
+        existingCsvUsd,
+        existingCsvJpy,
+        totalCsvUsd,
+        totalCsvJpy,
+        gainJpy,
+        gainUsd,
+        valueDiffJpy,
+        valueDiffUsd,
       };
     }
   );
 
   return {
-    existingCSV,
-    existingGain,
-    existingGainJpy,
-    existingTax,
-    existingTaxJpy,
+    crBasisUsd,
+    crBasisJpy,
+    crGrowthUsd,
+    crGrowthJpy,
+    crFxImpactUsd,
+    crFxImpactJpy,
+    crCsvUsd,
+    crCsvJpy,
+    crGainJpy,
+    crGainUsd,
     scenarios,
-    existingCSVJpy,
-    existingBasisJpy,
   };
 }
