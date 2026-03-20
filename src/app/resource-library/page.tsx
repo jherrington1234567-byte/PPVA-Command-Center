@@ -111,26 +111,43 @@ export default function ResourceLibraryPage() {
               {search && ` matching "${search}"`}
             </p>
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-              {filtered.map((resource) => (
-                <div key={resource.id} className="bg-white rounded-lg border border-gray-200 p-4 hover:shadow-md transition-shadow">
-                  <div className="flex items-start gap-3">
-                    <div className="mt-0.5">{TYPE_ICONS[resource.type]}</div>
-                    <div className="flex-1 min-w-0">
-                      <h3 className="text-sm font-semibold text-navy truncate">{resource.title}</h3>
-                      <p className="text-xs text-teal font-medium mt-0.5">{resource.category}</p>
-                      <p className="text-xs text-slate-brand mt-2 line-clamp-2">{resource.summary}</p>
-                      <div className="flex flex-wrap gap-1 mt-2">
-                        {resource.tags.slice(0, 4).map((tag) => (
-                          <span key={tag} className="text-xs bg-gray-100 text-slate-brand px-1.5 py-0.5 rounded">{tag}</span>
-                        ))}
+              {filtered.map((resource) => {
+                const hasFile = !!resource.sourceFile;
+                const fileUrl = hasFile ? `/api/resources?file=${encodeURIComponent(resource.sourceFile!)}` : undefined;
+                return (
+                  <a
+                    key={resource.id}
+                    href={fileUrl}
+                    target={hasFile ? "_blank" : undefined}
+                    rel={hasFile ? "noopener noreferrer" : undefined}
+                    className={`bg-white rounded-lg border border-gray-200 p-4 hover:shadow-md transition-shadow block ${hasFile ? "cursor-pointer" : "cursor-default"}`}
+                  >
+                    <div className="flex items-start gap-3">
+                      <div className="mt-0.5">{TYPE_ICONS[resource.type]}</div>
+                      <div className="flex-1 min-w-0">
+                        <h3 className="text-sm font-semibold text-navy truncate">{resource.title}</h3>
+                        <p className="text-xs text-teal font-medium mt-0.5">{resource.category}</p>
+                        <p className="text-xs text-slate-brand mt-2 line-clamp-2">{resource.summary}</p>
+                        <div className="flex flex-wrap gap-1 mt-2">
+                          {resource.tags.slice(0, 4).map((tag) => (
+                            <span key={tag} className="text-xs bg-gray-100 text-slate-brand px-1.5 py-0.5 rounded">{tag}</span>
+                          ))}
+                        </div>
+                        {resource.sourceFile ? (
+                          <p className="text-xs text-teal mt-2 flex items-center gap-1">
+                            <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                            </svg>
+                            Open file
+                          </p>
+                        ) : (
+                          <p className="text-xs text-gray-400 mt-2">Built-in reference</p>
+                        )}
                       </div>
-                      {resource.sourceFile && (
-                        <p className="text-xs text-gray-400 mt-2 truncate" title={resource.sourceFile}>{resource.sourceFile}</p>
-                      )}
                     </div>
-                  </div>
-                </div>
-              ))}
+                  </a>
+                );
+              })}
             </div>
             {filtered.length === 0 && (
               <div className="text-center py-12 text-slate-brand">
