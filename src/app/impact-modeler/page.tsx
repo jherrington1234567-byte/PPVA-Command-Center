@@ -4,6 +4,7 @@ import { PageHeader } from "@/components/layout/PageHeader";
 import { Tabs } from "@/components/ui/Tabs";
 import { TaxDeferralPower } from "@/components/impact-modeler/TaxDeferralPower";
 import { CrossBorderModule } from "@/components/impact-modeler/CrossBorderModule";
+import { AxonicOptimizer } from "@/components/impact-modeler/AxonicOptimizer";
 
 export default function ImpactModelerPage() {
   const tabs = [
@@ -14,6 +15,10 @@ export default function ImpactModelerPage() {
     {
       label: "Cross-Border / JPY",
       content: <CrossBorderModule />,
+    },
+    {
+      label: "Axonic Portfolio Optimizer",
+      content: <AxonicOptimizer />,
     },
   ];
 
