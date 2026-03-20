@@ -55,7 +55,7 @@ export function DealInputsPanel({ inputs, onUpdateField, onUpdateFund }: DealInp
             format="percent"
           />
           <NumberInput
-            label="3cStructures Load"
+            label="3cStructures (one-time)"
             value={inputs.threeCStructuresLoadPct}
             onChange={(v) => onUpdateField("threeCStructuresLoadPct", v)}
             format="percent"
@@ -79,7 +79,7 @@ export function DealInputsPanel({ inputs, onUpdateField, onUpdateFund }: DealInp
             format="percent"
           />
           <NumberInput
-            label="Admin Fee"
+            label="Advantage Admin Fee"
             value={inputs.advantageAdminFee}
             onChange={(v) => onUpdateField("advantageAdminFee", v)}
             format="currency"
@@ -126,6 +126,43 @@ export function DealInputsPanel({ inputs, onUpdateField, onUpdateFund }: DealInp
           <div className="text-xs text-slate-brand text-right">
             Total: {formatPercent(inputs.fundAllocations.reduce((s, f) => s + f.allocationPct, 0))}
           </div>
+        </div>
+      </section>
+
+      {/* Annual Charges (Ongoing Fees) */}
+      <section>
+        <h3 className="text-sm font-semibold text-navy mb-3 uppercase tracking-wider">
+          Annual Charges
+        </h3>
+        <div className="grid grid-cols-2 gap-3">
+          <NumberInput
+            label="Advantage M&E"
+            value={inputs.advantageMePct}
+            onChange={(v) => onUpdateField("advantageMePct", v)}
+            format="percent"
+            step={0.0001}
+          />
+          <NumberInput
+            label="Investment Advisor"
+            value={inputs.investmentAdvisorPct}
+            onChange={(v) => onUpdateField("investmentAdvisorPct", v)}
+            format="percent"
+            step={0.0001}
+          />
+          <NumberInput
+            label="Money Manager"
+            value={inputs.moneyManagerPct}
+            onChange={(v) => onUpdateField("moneyManagerPct", v)}
+            format="percent"
+            step={0.0001}
+          />
+          <NumberInput
+            label="Inspira Custodian"
+            value={inputs.inspiraCustodianPct}
+            onChange={(v) => onUpdateField("inspiraCustodianPct", v)}
+            format="percent"
+            step={0.0001}
+          />
         </div>
       </section>
 

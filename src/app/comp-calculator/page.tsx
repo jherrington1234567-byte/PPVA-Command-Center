@@ -24,8 +24,8 @@ const WATERFALL_COLORS = [
   "#003661", // navy - Total Deposit
   "#0086A3", // teal - Premium Load
   "#00ADEE", // sky - 3cStructures
-  "#00ADEE", // sky - Syndicated
-  "#4C5C68", // slate - PB Investment
+  "#00ADEE", // sky - Syndicated Capital
+  "#4C5C68", // slate - PB Investment Services
   "#0086A3", // teal - PBWR
   "#4C5C68", // slate - Ohana
   "#46494C", // dark gray - Admin
@@ -40,12 +40,12 @@ export default function CompCalculatorPage() {
 
   const waterfallData = [
     { name: "Premium Load", value: w.grossPremiumLoad },
-    { name: "3cStructures", value: w.threeCStructuresAmount },
-    { name: "Syndicated", value: w.syndicatedHoldback },
-    { name: "PB Investment", value: w.pbInvestmentHoldback },
+    { name: "3cStructures (one-time)", value: w.threeCStructuresAmount },
+    { name: "Syndicated Capital", value: w.syndicatedHoldback },
+    { name: "PB Investment Services", value: w.pbInvestmentHoldback },
     { name: "PBWR Share", value: w.pbwrShare },
     { name: "Ohana Share", value: w.ohanaShare },
-    { name: "Admin Fees", value: w.adminFees },
+    { name: "Advantage Admin", value: w.adminFees },
     { name: "Misc Fees", value: w.miscFees },
     { name: "Net to Fund", value: w.netToFund },
   ];
@@ -101,7 +101,7 @@ export default function CompCalculatorPage() {
                     tickFormatter={(v) => `$${(v / 1000).toFixed(0)}K`}
                     tick={{ fontSize: 11 }}
                   />
-                  <YAxis type="category" dataKey="name" width={100} tick={{ fontSize: 12 }} />
+                  <YAxis type="category" dataKey="name" width={150} tick={{ fontSize: 11 }} />
                   <Tooltip formatter={(value) => formatCurrency(Number(value))} />
                   <Bar dataKey="value" radius={[0, 4, 4, 0]}>
                     {waterfallData.map((_, i) => (
@@ -125,13 +125,13 @@ export default function CompCalculatorPage() {
               </thead>
               <tbody>
                 {[
-                  { party: "3cStructures", amount: w.threeCStructuresAmount },
+                  { party: "3cStructures (one-time)", amount: w.threeCStructuresAmount },
                   { party: "Syndicated Capital", amount: w.syndicatedHoldback },
                   { party: "PB Investment Services", amount: w.pbInvestmentHoldback },
                   { party: "PBWR", amount: w.pbwrShare },
                   { party: "Ohana", amount: w.ohanaShare },
-                  { party: "Advantage (Admin)", amount: w.adminFees },
-                  { party: "Bank/Setup", amount: w.miscFees },
+                  { party: "Advantage (Admin Fee)", amount: w.adminFees },
+                  { party: "Bank / Setup", amount: w.miscFees },
                 ].map((row) => (
                   <tr key={row.party} className="border-b border-gray-100 hover:bg-gray-50">
                     <td className="py-2 px-3 font-medium">{row.party}</td>
@@ -201,28 +201,61 @@ export default function CompCalculatorPage() {
           </table>
         </Card>
 
-        {/* Annual Recurring */}
-        <Card title="Annual Recurring Charges" description="Fees deducted from fund value each year">
+        {/* Annual Recurring Charges — with editable inputs */}
+        <Card title="Annual Recurring Charges" description="Ongoing fees deducted from fund value each year (adjust rates below)">
+          {/* Fee Rate Inputs */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6 p-4 bg-gray-50 rounded-lg">
+            <NumberInput
+              label="Advantage M&E Rate"
+              value={inputs.advantageMePct}
+              onChange={(v) => updateField("advantageMePct", v)}
+              format="percent"
+              step={0.0001}
+            />
+            <NumberInput
+              label="Investment Advisor Fee"
+              value={inputs.investmentAdvisorPct}
+              onChange={(v) => updateField("investmentAdvisorPct", v)}
+              format="percent"
+              step={0.0001}
+            />
+            <NumberInput
+              label="Money Manager Fee"
+              value={inputs.moneyManagerPct}
+              onChange={(v) => updateField("moneyManagerPct", v)}
+              format="percent"
+              step={0.0001}
+            />
+            <NumberInput
+              label="Inspira Custodian Fee"
+              value={inputs.inspiraCustodianPct}
+              onChange={(v) => updateField("inspiraCustodianPct", v)}
+              format="percent"
+              step={0.0001}
+            />
+          </div>
+
+          {/* Fee Summary Tiles */}
           <div className="grid grid-cols-5 gap-4">
             <div className="bg-gray-50 rounded-lg p-4">
               <p className="text-xs font-medium text-slate-brand uppercase">Advantage M&E</p>
               <p className="mt-1 text-lg font-semibold text-navy">{formatCurrency(result.annualCharges.advantageMeFee)}</p>
-              <p className="text-xs text-slate-brand">0.15%</p>
+              <p className="text-xs text-slate-brand">{formatPercent(inputs.advantageMePct)}</p>
             </div>
             <div className="bg-gray-50 rounded-lg p-4">
               <p className="text-xs font-medium text-slate-brand uppercase">Investment Advisor</p>
               <p className="mt-1 text-lg font-semibold text-navy">{formatCurrency(result.annualCharges.investmentAdvisorFee)}</p>
-              <p className="text-xs text-slate-brand">0.15%</p>
-            </div>
-            <div className="bg-gray-50 rounded-lg p-4">
-              <p className="text-xs font-medium text-slate-brand uppercase">Inspira Custodian</p>
-              <p className="mt-1 text-lg font-semibold text-navy">{formatCurrency(result.annualCharges.inspiraCustodianFee)}</p>
-              <p className="text-xs text-slate-brand">0.05%</p>
+              <p className="text-xs text-slate-brand">{formatPercent(inputs.investmentAdvisorPct)}</p>
             </div>
             <div className="bg-gray-50 rounded-lg p-4">
               <p className="text-xs font-medium text-slate-brand uppercase">Money Manager</p>
               <p className="mt-1 text-lg font-semibold text-navy">{formatCurrency(result.annualCharges.moneyManagerFee)}</p>
-              <p className="text-xs text-slate-brand">configurable</p>
+              <p className="text-xs text-slate-brand">{formatPercent(inputs.moneyManagerPct)}</p>
+            </div>
+            <div className="bg-gray-50 rounded-lg p-4">
+              <p className="text-xs font-medium text-slate-brand uppercase">Inspira Custodian</p>
+              <p className="mt-1 text-lg font-semibold text-navy">{formatCurrency(result.annualCharges.inspiraCustodianFee)}</p>
+              <p className="text-xs text-slate-brand">{formatPercent(inputs.inspiraCustodianPct)}</p>
             </div>
             <div className="bg-navy rounded-lg p-4">
               <p className="text-xs font-medium text-white/80 uppercase">Total Annual</p>
