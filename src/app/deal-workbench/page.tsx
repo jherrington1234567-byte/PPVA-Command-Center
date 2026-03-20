@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { DealInputsPanel } from "@/components/deal-workbench/DealInputsPanel";
 import { DealSummaryCards } from "@/components/deal-workbench/DealSummaryCards";
@@ -7,6 +8,7 @@ import { PremiumLoadWaterfall } from "@/components/deal-workbench/PremiumLoadWat
 import { FundAllocationTable } from "@/components/deal-workbench/FundAllocationTable";
 import { CarrierIllustration } from "@/components/deal-workbench/CarrierIllustration";
 import { TaxImpactPanel } from "@/components/deal-workbench/TaxImpactPanel";
+import { PortfolioBuilder } from "@/components/deal-workbench/PortfolioBuilder";
 import { Tabs } from "@/components/ui/Tabs";
 import { Card } from "@/components/ui/Card";
 import { useDealInputs } from "@/hooks/useDealInputs";
@@ -15,6 +17,7 @@ import { formatCurrency, formatPercent } from "@/lib/format";
 import { AnnualChargesResult, DealInputs } from "@/lib/calc/types";
 import { Button } from "@/components/ui/Button";
 import { t } from "@/lib/translations";
+import { PortfolioFund } from "@/lib/fund-catalog";
 
 const LANGUAGE_OPTIONS: { value: DealInputs["language"]; label: string }[] = [
   { value: "english", label: "English" },
@@ -71,6 +74,12 @@ export default function DealWorkbenchPage() {
   const { inputs, updateField, updateFundAllocation } = useDealInputs();
   const result = useDealCalculation(inputs);
   const lang = inputs.language;
+  const [portfolioFunds, setPortfolioFunds] = useState<PortfolioFund[]>([]);
+
+  // Calculate non-guaranteed sleeve percentage from fund allocations
+  const nonGuaranteedPct = inputs.fundAllocations
+    .filter((f) => !f.isGuaranteed)
+    .reduce((s, f) => s + f.allocationPct, 0);
 
   const tabs = [
     {
@@ -92,6 +101,21 @@ export default function DealWorkbenchPage() {
             <AnnualChargesDisplay charges={result.annualCharges} language={lang} />
           </Card>
         </div>
+      ),
+    },
+    {
+      label: "Portfolio Builder",
+      content: (
+        <Card
+          title="Non-Guaranteed Sleeve — Portfolio Builder"
+          description="Select funds from Crystal Capital, SALI platform, or enter custom funds. Set allocations within the non-guaranteed sleeve."
+        >
+          <PortfolioBuilder
+            selectedFunds={portfolioFunds}
+            onUpdateFunds={setPortfolioFunds}
+            nonGuaranteedPct={nonGuaranteedPct}
+          />
+        </Card>
       ),
     },
     {
